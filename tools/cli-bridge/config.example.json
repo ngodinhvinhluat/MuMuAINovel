@@ -1,0 +1,28 @@
+{
+  "host": "127.0.0.1",
+  "port": 8787,
+  "apiKey": "",
+  "requestTimeoutSeconds": 900,
+  "keepaliveSeconds": 15,
+  "claude": {
+    "enabled": true,
+    "command": "claude",
+    "maxConcurrent": 2,
+    "models": {
+      "claude-sonnet": "sonnet",
+      "claude-opus": "opus",
+      "claude-haiku": "haiku"
+    },
+    "extraArgs": []
+  },
+  "codex": {
+    "enabled": true,
+    "command": "codex",
+    "maxConcurrent": 2,
+    "models": {
+      "codex": ""
+    },
+    "reasoningEffort": "",
+    "extraArgs": []
+  }
+}

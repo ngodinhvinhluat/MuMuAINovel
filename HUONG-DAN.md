@@ -17,3 +17,14 @@ Cấu hình và mật khẩu nằm trong `.env`; không chia sẻ file này.
 
 Bản cài hiện tại đã có `.env`. Khi clone trên máy khác, sao chép `backend/.env.example` thành `.env`, đặt mật khẩu mới cho `POSTGRES_PASSWORD` và `LOCAL_AUTH_PASSWORD`, đặt `SESSION_COOKIE_SECURE=false` cho truy cập HTTP localhost. Đặt `POSTGRES_PORT=127.0.0.1:5432` để chỉ mở PostgreSQL trên máy đó.
 Chạy `docker compose -f compose.local.yaml pull` trước khi chạy `Start-MuMu.bat` lần đầu.
+
+## Dùng Claude CLI / Codex CLI thay cho API key
+
+Có thể dùng gói Claude Pro/Max hoặc ChatGPT Plus/Pro thông qua CLI thay vì API key:
+
+1. Cài Node.js, rồi `npm install -g @anthropic-ai/claude-code @openai/codex`. Đăng nhập bằng `claude` (lệnh `/login`) và `codex login`.
+2. Chạy `Start-CLI-Bridge.bat` một lần để tạo `tools/cli-bridge/config.json`; copy giá trị `apiKey` trong đó.
+3. Thêm `ALLOWED_AI_HOSTS=host.docker.internal` vào `.env`, rồi chạy lại `Start-MuMu.bat` (từ giờ nó tự bật bridge).
+4. Trong cài đặt AI của MuMu: nhà cung cấp **OpenAI**, URL `http://host.docker.internal:8787/v1`, API key là `apiKey` ở bước 2, model `claude-sonnet` / `claude-opus` / `claude-haiku` / `codex`.
+
+Chi tiết và giới hạn: `tools/cli-bridge/README.md`.
