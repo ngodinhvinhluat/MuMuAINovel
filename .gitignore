@@ -130,3 +130,6 @@ backend/tests/
 **/test_*.py
 **/*_test.py
 tool/
+
+# Local deployment data
+/storage/
