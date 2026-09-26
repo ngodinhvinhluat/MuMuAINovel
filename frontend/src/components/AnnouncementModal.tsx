@@ -1,5 +1,6 @@
 import { Modal, Button, Space, theme } from 'antd';
 import { useEffect, useState } from 'react';
+import { t } from '../i18n';
 
 interface AnnouncementModalProps {
   visible: boolean;
@@ -40,7 +41,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
           color: token.colorPrimary,
           textAlign: 'center',
         }}>
-          🎉 欢迎使用 AI小说创作助手
+          {t('🎉 欢迎使用 AI小说创作助手')}
         </div>
       }
       open={visible}
@@ -56,7 +57,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
               fontSize: '14px',
             }}
           >
-            今日内不再展示
+            {t('今日内不再展示')}
           </Button>
           <Button
             type="primary"
@@ -71,7 +72,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
               boxShadow: `0 8px 20px ${alphaColor(token.colorPrimary, 0.32)}`,
             }}
           >
-            永不再展示
+            {t('永不再展示')}
           </Button>
         </Space>
       }
@@ -101,20 +102,20 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
           color: token.colorTextSecondary,
           lineHeight: '1.5',
         }}>
-          <p style={{ marginBottom: '8px' }}>👋 欢迎加入我们的交流群！在这里你可以：</p>
+          <p style={{ marginBottom: '8px' }}>{t('👋 欢迎加入我们的交流群！在这里你可以：')}</p>
           <ul style={{
             textAlign: 'left',
             marginLeft: '40px',
             marginTop: '0',
             marginBottom: '12px',
           }}>
-            <li>💬 与其他创作者交流心得</li>
-            <li>💡 获取最新功能更新和使用技巧</li>
-            <li>🐛 反馈问题和建议</li>
-            <li>📚 分享创作经验和灵感</li>
+            <li>{t('💬 与其他创作者交流心得')}</li>
+            <li>{t('💡 获取最新功能更新和使用技巧')}</li>
+            <li>{t('🐛 反馈问题和建议')}</li>
+            <li>{t('📚 分享创作经验和灵感')}</li>
           </ul>
           <p style={{ fontWeight: 600, color: token.colorText, marginBottom: '12px' }}>
-            扫描下方二维码加入交流群：
+            {t('扫描下方二维码加入交流群：')}
           </p>
         </div>
 
@@ -136,7 +137,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
             minWidth: '200px',
           }}>
             <p style={{ fontWeight: 600, color: token.colorText, marginBottom: '8px', fontSize: '14px' }}>
-              QQ交流群
+              {t('QQ交流群')}
             </p>
             {!qqImageError ? (
               <div style={{
@@ -150,7 +151,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
               }}>
                 <img
                   src="/qq.jpg"
-                  alt="QQ交流群二维码"
+                  alt={t('QQ交流群二维码')}
                   style={{
                     maxWidth: '180px',
                     maxHeight: '180px',
@@ -173,7 +174,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
                 borderRadius: '8px',
                 color: token.colorTextTertiary,
               }}>
-                <p>二维码加载失败</p>
+                <p>{t('二维码加载失败')}</p>
               </div>
             )}
           </div>
@@ -186,7 +187,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
             minWidth: '200px',
           }}>
             <p style={{ fontWeight: 600, color: token.colorText, marginBottom: '8px', fontSize: '14px' }}>
-              微信交流群
+              {t('微信交流群')}
             </p>
             {!wxImageError ? (
               <div style={{
@@ -200,7 +201,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
               }}>
                 <img
                   src="/WX.png"
-                  alt="微信交流群二维码"
+                  alt={t('微信交流群二维码')}
                   style={{
                     maxWidth: '180px',
                     maxHeight: '180px',
@@ -223,7 +224,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
                 borderRadius: '8px',
                 color: token.colorTextTertiary,
               }}>
-                <p>二维码加载失败</p>
+                <p>{t('二维码加载失败')}</p>
               </div>
             )}
           </div>
@@ -238,7 +239,7 @@ export default function AnnouncementModal({ visible, onClose, onDoNotShowToday, 
           fontSize: '13px',
           color: token.colorWarning,
         }}>
-          💡 提示：选择"今日内不再展示"当天不再显示，选择"永不再展示"将永久隐藏此公告
+          {t('💡 提示：选择"今日内不再展示"当天不再显示，选择"永不再展示"将永久隐藏此公告')}
         </div>
       </div>
     </Modal>

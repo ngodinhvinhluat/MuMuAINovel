@@ -1,4 +1,5 @@
 import { VERSION_INFO } from '../config/version';
+import { t } from '../i18n';
 
 interface VersionCheckResult {
   hasUpdate: boolean;
@@ -68,7 +69,7 @@ export async function checkLatestVersion(): Promise<VersionCheckResult> {
       }
     }
     
-    throw new Error('无法从 Badge API 解析版本信息');
+    throw new Error(t('无法从 Badge API 解析版本信息'));
   } catch {
     // 失败时返回无更新
     return {

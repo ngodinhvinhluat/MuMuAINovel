@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 /**
  * GitHub 提交日志获取服务
  * 用于从 GitHub API 获取项目的提交历史并转换为更新日志
@@ -163,7 +164,7 @@ export async function fetchGitHubCommits(page: number = 1, perPage: number = 30)
     });
 
     if (!response.ok) {
-      throw new Error(`GitHub API 请求失败: ${response.status} ${response.statusText}`);
+      throw new Error(t('GitHub API 请求失败: {{status}} {{statusText}}', { status: response.status, statusText: response.statusText }));
     }
 
     return await response.json();

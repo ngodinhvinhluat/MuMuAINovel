@@ -3,6 +3,7 @@ import { Modal, Button, Card, Statistic, Row, Col, message, theme } from 'antd';
 import { CheckOutlined, CloseOutlined, SwapOutlined } from '@ant-design/icons';
 import ReactDiffViewer from 'react-diff-viewer-continued';
 import { useThemeMode } from '../theme/useThemeMode';
+import { t } from '../i18n';
 
 interface ChapterContentComparisonProps {
   visible: boolean;
@@ -99,10 +100,10 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error('应用新内容失败');
+        throw new Error(t('应用新内容失败'));
       }
 
-      message.success('新内容已应用！');
+      message.success(t('新内容已应用！'));
 
       // 先调用 onApply 通知父组件刷新
       onApply();
@@ -118,20 +119,20 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
           });
 
           if (analysisResponse.ok) {
-            message.success('章节分析已开始，请稍后查看结果');
+            message.success(t('章节分析已开始，请稍后查看结果'));
           } else {
-            message.warning('章节分析触发失败，您可以手动触发分析');
+            message.warning(t('章节分析触发失败，您可以手动触发分析'));
           }
         } catch (analysisError) {
           console.error('触发分析失败:', analysisError);
-          message.warning('章节分析触发失败，您可以手动触发分析');
+          message.warning(t('章节分析触发失败，您可以手动触发分析'));
         }
       }, 500);
 
       onClose();
     } catch (error: unknown) {
       const err = error as Error;
-      message.error(err.message || '应用失败');
+      message.error(err.message || t('应用失败'));
     } finally {
       setApplying(false);
     }
@@ -139,16 +140,16 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
 
   const handleDiscard = () => {
     modal.confirm({
-      title: '确认放弃',
-      content: '确定要放弃新生成的内容吗？此操作不可恢复。',
+      title: t('确认放弃'),
+      content: t('确定要放弃新生成的内容吗？此操作不可恢复。'),
       centered: true,
-      okText: '确定放弃',
-      cancelText: '取消',
+      okText: t('确定放弃'),
+      cancelText: t('取消'),
       okButtonProps: { danger: true },
       onOk: () => {
         onDiscard();
         onClose();
-        message.info('已放弃新内容');
+        message.info(t('已放弃新内容'));
       }
     });
   };
@@ -157,7 +158,7 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
     <>
       {contextHolder}
       <Modal
-      title={`内容对比 - ${chapterTitle}`}
+      title={t('内容对比 - {{chapterTitle}}', { chapterTitle })}
       open={visible}
       onCancel={onClose}
       width="95%"
@@ -170,14 +171,14 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
           icon={<CloseOutlined />}
           onClick={handleDiscard}
         >
-          放弃新内容
+          {t('放弃新内容')}
         </Button>,
         <Button
           key="toggle"
           icon={<SwapOutlined />}
           onClick={() => setViewMode(viewMode === 'split' ? 'unified' : 'split')}
         >
-          切换视图
+          {t('切换视图')}
         </Button>,
         <Button
           key="apply"
@@ -186,7 +187,7 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
           loading={applying}
           onClick={handleApply}
         >
-          应用新内容
+          {t('应用新内容')}
         </Button>
       ]}
     >
@@ -195,30 +196,30 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
         <Row gutter={16}>
           <Col span={6}>
             <Statistic
-              title="原内容字数"
+              title={t('原内容字数')}
               value={originalWordCount}
-              suffix="字"
+              suffix={t('字')}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="新内容字数"
+              title={t('新内容字数')}
               value={wordCount}
-              suffix="字"
+              suffix={t('字')}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="字数变化"
+              title={t('字数变化')}
               value={wordCountDiff}
-              suffix="字"
+              suffix={t('字')}
               valueStyle={{ color: wordCountDiff > 0 ? 'var(--color-success)' : 'var(--color-error)' }}
               prefix={wordCountDiff > 0 ? '+' : ''}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="变化比例"
+              title={t('变化比例')}
               value={wordCountDiffPercent}
               suffix="%"
               valueStyle={{ color: Math.abs(parseFloat(wordCountDiffPercent)) < 10 ? 'var(--color-primary)' : 'var(--color-warning)' }}
@@ -240,8 +241,8 @@ const ChapterContentComparison: React.FC<ChapterContentComparisonProps> = ({
           oldValue={originalContent}
           newValue={newContent}
           splitView={viewMode === 'split'}
-          leftTitle="原内容"
-          rightTitle="新内容"
+          leftTitle={t('原内容')}
+          rightTitle={t('新内容')}
           showDiffOnly={false}
           useDarkTheme={isDarkMode}
           styles={diffViewerStyles}

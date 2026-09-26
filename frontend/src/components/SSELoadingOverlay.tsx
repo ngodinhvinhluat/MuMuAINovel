@@ -1,6 +1,7 @@
 import React from 'react';
 import { Spin, theme } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { t } from '../i18n';
 
 interface SSELoadingOverlayProps {
   loading: boolean;
@@ -52,7 +53,7 @@ export const SSELoadingOverlay: React.FC<SSELoadingOverlayProps> = ({
             marginTop: 16,
             color: token.colorTextHeading
           }}>
-            AI生成中...
+            {t('AI生成中...')}
           </div>
         </div>
 
@@ -99,7 +100,7 @@ export const SSELoadingOverlay: React.FC<SSELoadingOverlayProps> = ({
           minHeight: 24,
           padding: '0 20px'
         }}>
-          {message || '准备生成...'}
+          {message || t('准备生成...')}
         </div>
 
         {/* 提示文字 */}
@@ -109,7 +110,7 @@ export const SSELoadingOverlay: React.FC<SSELoadingOverlayProps> = ({
           color: token.colorTextTertiary,
           marginTop: 16
         }}>
-          请勿关闭页面,生成过程需要一定时间
+          {t('请勿关闭页面,生成过程需要一定时间')}
         </div>
       </div>
     </div>

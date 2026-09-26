@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import type { Announcement, AnnouncementLevel } from '../types';
 import MarkdownRenderer from './MarkdownRenderer';
+import { t, getDateLocale } from '../i18n';
 
 const { Paragraph, Text, Title } = Typography;
 
@@ -25,17 +26,17 @@ interface AnnouncementTimelineModalProps {
 }
 
 const levelConfig: Record<AnnouncementLevel, { color: string; label: string; icon: React.ReactNode }> = {
-  info: { color: 'blue', label: '通知', icon: <InfoCircleOutlined /> },
-  success: { color: 'green', label: '完成', icon: <CheckCircleOutlined /> },
-  warning: { color: 'orange', label: '提醒', icon: <WarningOutlined /> },
-  error: { color: 'red', label: '重要', icon: <CloseCircleOutlined /> },
+  info: { color: 'blue', label: t('通知'), icon: <InfoCircleOutlined /> },
+  success: { color: 'green', label: t('完成'), icon: <CheckCircleOutlined /> },
+  warning: { color: 'orange', label: t('提醒'), icon: <WarningOutlined /> },
+  error: { color: 'red', label: t('重要'), icon: <CloseCircleOutlined /> },
 };
 
 const formatDateTime = (value?: string | null) => {
-  if (!value) return '未设置时间';
+  if (!value) return t('未设置时间');
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '时间格式异常';
-  return date.toLocaleString('zh-CN', {
+  if (Number.isNaN(date.getTime())) return t('时间格式异常');
+  return date.toLocaleString(getDateLocale(), {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -64,14 +65,14 @@ export default function AnnouncementTimelineModal({
       title={
         <Space>
           <BellOutlined />
-          <span>系统公告</span>
+          <span>{t('系统公告')}</span>
           <Button
             type="text"
             size="small"
             icon={<ReloadOutlined />}
             onClick={onRefresh}
             loading={loading}
-            title="刷新公告"
+            title={t('刷新公告')}
           />
         </Space>
       }
@@ -79,7 +80,7 @@ export default function AnnouncementTimelineModal({
       onCancel={handleClose}
       footer={[
         <Button key="close" type="primary" onClick={handleClose}>
-          关闭
+          {t('关闭')}
         </Button>,
       ]}
       width={800}
@@ -101,10 +102,10 @@ export default function AnnouncementTimelineModal({
       </style>
       {loading && announcements.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Spin size="large" tip="加载公告中..." />
+          <Spin size="large" tip={t('加载公告中...')} />
         </div>
       ) : announcements.length === 0 ? (
-        <Empty description="暂无公告" />
+        <Empty description={t('暂无公告')} />
       ) : (
         <Timeline className="announcement-timeline">
           {announcements.map(item => {
@@ -131,7 +132,7 @@ export default function AnnouncementTimelineModal({
                 <div style={{ marginLeft: 10, paddingBottom: 18 }}>
                   <Space size="small" wrap style={{ marginBottom: 8 }}>
                     <Tag color={config.color} icon={config.icon}>{config.label}</Tag>
-                    {item.pinned && <Tag color="gold" icon={<PushpinFilled />}>置顶</Tag>}
+                    {item.pinned && <Tag color="gold" icon={<PushpinFilled />}>{t('置顶')}</Tag>}
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       <ClockCircleOutlined style={{ marginRight: 4 }} />
                       {formatDateTime(item.publish_at || item.created_at)}
@@ -152,7 +153,7 @@ export default function AnnouncementTimelineModal({
 
                   {item.author_name && (
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      发布者：{item.author_name}
+                      {t('发布者：{{author_name}}', { author_name: item.author_name })}
                     </Text>
                   )}
                 </div>

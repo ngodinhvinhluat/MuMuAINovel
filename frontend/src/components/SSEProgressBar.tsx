@@ -1,5 +1,6 @@
 import React from 'react';
 import { theme } from 'antd';
+import { t } from '../i18n';
 
 interface SSEProgressBarProps {
   loading: boolean;
@@ -43,7 +44,7 @@ export const SSEProgressBar: React.FC<SSEProgressBarProps> = ({
         fontSize: 14
       }}>
         <span style={{ color: token.colorTextSecondary }}>
-          {message || '准备生成...'}
+          {message || t('准备生成...')}
         </span>
         <span style={{ 
           fontWeight: 'bold',

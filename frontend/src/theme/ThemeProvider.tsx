@@ -1,5 +1,7 @@
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import viVN from 'antd/locale/vi_VN';
+import { getLanguage } from '../i18n';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { getThemeConfig, type ResolvedThemeMode } from './themeConfig';
@@ -142,7 +144,7 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
   return (
     <ThemeModeContext.Provider value={contextValue}>
       <ConfigProvider
-        locale={zhCN}
+        locale={getLanguage() === 'vi' ? viVN : zhCN}
         theme={{
           ...themeConfig,
           cssVar: true,

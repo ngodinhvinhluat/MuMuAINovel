@@ -3,6 +3,7 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
+import { t } from '../i18n';
 
 const { Text } = Typography;
 
@@ -85,7 +86,7 @@ export default function MarkdownRenderer({ content, compact = false }: MarkdownR
         <img
           {...props}
           src={safeSrc}
-          alt={alt || '公告图片'}
+          alt={alt || t('公告图片')}
           loading="lazy"
         />
       );
@@ -294,7 +295,7 @@ export default function MarkdownRenderer({ content, compact = false }: MarkdownR
           {markdown}
         </ReactMarkdown>
       ) : (
-        <Text type="secondary">暂无内容</Text>
+        <Text type="secondary">{t('暂无内容')}</Text>
       )}
     </div>
   );
