@@ -3,6 +3,7 @@ import { BulbOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
 import { useThemeMode } from '../theme/useThemeMode';
 import type { ThemeMode } from '../theme/themeStorage';
 import type { ReactNode } from 'react';
+import { t } from '../i18n';
 
 interface ThemeSwitchProps {
   size?: 'small' | 'middle' | 'large';
@@ -13,7 +14,7 @@ const options: Array<{ value: ThemeMode; label: ReactNode }> = [
   {
     value: 'light',
     label: (
-      <Tooltip title="浅色模式">
+      <Tooltip title={t('浅色模式')}>
         <BulbOutlined />
       </Tooltip>
     ),
@@ -21,7 +22,7 @@ const options: Array<{ value: ThemeMode; label: ReactNode }> = [
   {
     value: 'dark',
     label: (
-      <Tooltip title="深色模式">
+      <Tooltip title={t('深色模式')}>
         <MoonOutlined />
       </Tooltip>
     ),
@@ -29,7 +30,7 @@ const options: Array<{ value: ThemeMode; label: ReactNode }> = [
   {
     value: 'system',
     label: (
-      <Tooltip title="跟随系统">
+      <Tooltip title={t('跟随系统')}>
         <DesktopOutlined />
       </Tooltip>
     ),

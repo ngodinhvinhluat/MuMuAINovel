@@ -6,6 +6,7 @@ import { BellOutlined, CheckCircleOutlined, DeleteOutlined, EditOutlined, EyeInv
 import { announcementApi, authApi, settingsApi } from '../services/api';
 import type { Announcement, AnnouncementCreate, AnnouncementLevel, AnnouncementStatus, AnnouncementStatusResponse, AnnouncementUpdate, SystemSMTPSettings, SystemSMTPSettingsUpdate, User } from '../types';
 import MarkdownRenderer from '../components/MarkdownRenderer';
+import { t } from '../i18n';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -20,10 +21,10 @@ const qqDefaults: Pick<SystemSMTPSettings, 'smtp_provider' | 'smtp_host' | 'smtp
 };
 
 const announcementLevelText: Record<AnnouncementLevel, string> = {
-  info: '通知',
-  success: '成功',
-  warning: '警告',
-  error: '重要',
+  info: t('通知'),
+  success: t('成功'),
+  warning: t('警告'),
+  error: t('重要'),
 };
 
 const announcementLevelColor: Record<AnnouncementLevel, string> = {
@@ -34,9 +35,9 @@ const announcementLevelColor: Record<AnnouncementLevel, string> = {
 };
 
 const announcementStatusText: Record<AnnouncementStatus, string> = {
-  draft: '草稿',
-  published: '已发布',
-  hidden: '已隐藏',
+  draft: t('草稿'),
+  published: t('已发布'),
+  hidden: t('已隐藏'),
 };
 
 const announcementStatusColor: Record<AnnouncementStatus, string> = {
@@ -108,7 +109,7 @@ export default function SystemSettingsPage() {
       return status;
     } catch (error) {
       console.error('加载公告服务状态失败:', error);
-      message.error('加载公告服务状态失败');
+      message.error(t('加载公告服务状态失败'));
       return null;
     } finally {
       setAnnouncementStatusLoading(false);
@@ -139,7 +140,7 @@ export default function SystemSettingsPage() {
       });
     } catch (error) {
       console.error('加载公告列表失败:', error);
-      message.error('加载公告列表失败，请确认当前实例为服务端模式且账号拥有管理员权限');
+      message.error(t('加载公告列表失败，请确认当前实例为服务端模式且账号拥有管理员权限'));
     } finally {
       setAnnouncementLoading(false);
     }
@@ -158,7 +159,7 @@ export default function SystemSettingsPage() {
       form.setFieldsValue(smtpSettings);
     } catch (error) {
       console.error('加载系统设置失败:', error);
-      message.error('加载系统设置失败');
+      message.error(t('加载系统设置失败'));
     } finally {
       setInitialLoading(false);
     }
@@ -204,10 +205,10 @@ export default function SystemSettingsPage() {
         : values;
       const result = await settingsApi.updateSystemSMTPSettings(payload);
       form.setFieldsValue(result);
-      message.success('系统 SMTP 设置已保存');
+      message.success(t('系统 SMTP 设置已保存'));
     } catch (error) {
       console.error('保存系统设置失败:', error);
-      message.error('保存系统设置失败');
+      message.error(t('保存系统设置失败'));
     } finally {
       setSaving(false);
     }
@@ -216,7 +217,7 @@ export default function SystemSettingsPage() {
   const handleTest = async () => {
     const toEmail = testTargetEmail.trim();
     if (!toEmail) {
-      message.warning('请先填写测试目标邮箱');
+      message.warning(t('请先填写测试目标邮箱'));
       return;
     }
 
@@ -226,11 +227,11 @@ export default function SystemSettingsPage() {
       if (result.success) {
         message.success(result.message);
       } else {
-        message.error(result.message || 'SMTP 测试失败');
+        message.error(result.message || t('SMTP 测试失败'));
       }
     } catch (error) {
       console.error('测试 SMTP 配置失败:', error);
-      message.error('测试 SMTP 配置失败');
+      message.error(t('测试 SMTP 配置失败'));
     } finally {
       setTesting(false);
     }
@@ -238,7 +239,7 @@ export default function SystemSettingsPage() {
 
   const openCreateAnnouncementModal = () => {
     if (!announcementAdminAvailable) {
-      message.warning('公告发布仅在服务端模式可用');
+      message.warning(t('公告发布仅在服务端模式可用'));
       return;
     }
     setEditingAnnouncement(null);
@@ -278,7 +279,7 @@ export default function SystemSettingsPage() {
 
   const validateAnnouncementWindow = (values: AnnouncementFormValues) => {
     if (values.publish_at && values.expire_at && !values.expire_at.isAfter(values.publish_at)) {
-      message.warning('过期时间必须晚于发布时间');
+      message.warning(t('过期时间必须晚于发布时间'));
       return false;
     }
     return true;
@@ -332,16 +333,16 @@ export default function SystemSettingsPage() {
     try {
       if (editingAnnouncement) {
         await announcementApi.adminUpdate(editingAnnouncement.id, buildAnnouncementUpdatePayload(values));
-        message.success('公告已更新');
+        message.success(t('公告已更新'));
       } else {
         await announcementApi.adminCreate(buildAnnouncementCreatePayload(values));
-        message.success('公告已创建');
+        message.success(t('公告已创建'));
       }
       closeAnnouncementModal();
       await loadAnnouncements(announcementPagination.current, announcementPagination.pageSize, announcementSearchKeyword);
     } catch (error) {
       console.error('保存公告失败:', error);
-      message.error('保存公告失败，请确认当前实例为服务端模式且账号拥有管理员权限');
+      message.error(t('保存公告失败，请确认当前实例为服务端模式且账号拥有管理员权限'));
     } finally {
       setAnnouncementSaving(false);
     }
@@ -350,11 +351,11 @@ export default function SystemSettingsPage() {
   const handleDeleteAnnouncement = async (announcementId: string) => {
     try {
       await announcementApi.adminDelete(announcementId);
-      message.success('公告已删除');
+      message.success(t('公告已删除'));
       await loadAnnouncements(announcementPagination.current, announcementPagination.pageSize, announcementSearchKeyword);
     } catch (error) {
       console.error('删除公告失败:', error);
-      message.error('删除公告失败');
+      message.error(t('删除公告失败'));
     }
   };
 
@@ -362,15 +363,15 @@ export default function SystemSettingsPage() {
     try {
       if (action === 'publish') {
         await announcementApi.adminPublish(announcementId);
-        message.success('公告已发布');
+        message.success(t('公告已发布'));
       } else {
         await announcementApi.adminHide(announcementId);
-        message.success('公告已隐藏');
+        message.success(t('公告已隐藏'));
       }
       await loadAnnouncements(announcementPagination.current, announcementPagination.pageSize, announcementSearchKeyword);
     } catch (error) {
       console.error('更新公告状态失败:', error);
-      message.error('更新公告状态失败');
+      message.error(t('更新公告状态失败'));
     }
   };
 
@@ -389,7 +390,7 @@ export default function SystemSettingsPage() {
 
   const announcementColumns: ColumnsType<Announcement> = [
     {
-      title: '标题',
+      title: t('标题'),
       dataIndex: 'title',
       key: 'title',
       width: 240,
@@ -397,21 +398,21 @@ export default function SystemSettingsPage() {
         <Space direction="vertical" size={4}>
           <Space size={6} wrap>
             <Text strong>{title}</Text>
-            {record.pinned && <Tag color="gold">置顶</Tag>}
+            {record.pinned && <Tag color="gold">{t('置顶')}</Tag>}
           </Space>
           {record.summary && <Text type="secondary" style={{ fontSize: 12 }}>{record.summary}</Text>}
         </Space>
       ),
     },
     {
-      title: '级别',
+      title: t('级别'),
       dataIndex: 'level',
       key: 'level',
       width: 100,
       render: (level: AnnouncementLevel) => <Tag color={announcementLevelColor[level]}>{announcementLevelText[level]}</Tag>,
     },
     {
-      title: '状态',
+      title: t('状态'),
       dataIndex: 'status',
       key: 'status',
       width: 100,
@@ -421,28 +422,28 @@ export default function SystemSettingsPage() {
       },
     },
     {
-      title: '发布时间',
+      title: t('发布时间'),
       dataIndex: 'publish_at',
       key: 'publish_at',
       width: 150,
       render: (value?: string | null) => <Text type="secondary">{formatDateTime(value)}</Text>,
     },
     {
-      title: '过期时间',
+      title: t('过期时间'),
       dataIndex: 'expire_at',
       key: 'expire_at',
       width: 150,
       render: (value?: string | null) => <Text type="secondary">{formatDateTime(value)}</Text>,
     },
     {
-      title: '作者',
+      title: t('作者'),
       dataIndex: 'author_name',
       key: 'author_name',
       width: 120,
       render: (value?: string | null) => value || '-',
     },
     {
-      title: '操作',
+      title: t('操作'),
       key: 'actions',
       fixed: 'right',
       width: 240,
@@ -451,28 +452,28 @@ export default function SystemSettingsPage() {
         return (
           <Space size="small" wrap>
             <Button size="small" icon={<EditOutlined />} disabled={!announcementAdminAvailable} onClick={() => openEditAnnouncementModal(record)}>
-              编辑
+              {t('编辑')}
             </Button>
             {currentStatus !== 'published' ? (
               <Button size="small" type="primary" icon={<SendOutlined />} disabled={!announcementAdminAvailable} onClick={() => void handleAnnouncementStatusChange(record.id, 'publish')}>
-                发布
+                {t('发布')}
               </Button>
             ) : (
               <Button size="small" icon={<EyeInvisibleOutlined />} disabled={!announcementAdminAvailable} onClick={() => void handleAnnouncementStatusChange(record.id, 'hide')}>
-                隐藏
+                {t('隐藏')}
               </Button>
             )}
             <Popconfirm
-              title="删除公告"
-              description="删除后客户端将不再同步该公告，确认删除吗？"
-              okText="删除"
-              cancelText="取消"
+              title={t('删除公告')}
+              description={t('删除后客户端将不再同步该公告，确认删除吗？')}
+              okText={t('删除')}
+              cancelText={t('取消')}
               okButtonProps={{ danger: true }}
               onConfirm={() => void handleDeleteAnnouncement(record.id)}
               disabled={!announcementAdminAvailable}
             >
               <Button size="small" danger icon={<DeleteOutlined />} disabled={!announcementAdminAvailable}>
-                删除
+                {t('删除')}
               </Button>
             </Popconfirm>
           </Space>
@@ -492,7 +493,7 @@ export default function SystemSettingsPage() {
   if (!currentUser?.is_admin) {
     return (
       <div style={{ padding: 24 }}>
-        <Alert type="error" showIcon message="无权限访问" description="只有管理员可以访问系统设置。" />
+        <Alert type="error" showIcon message={t('无权限访问')} description={t('只有管理员可以访问系统设置。')} />
       </div>
     );
   }
@@ -522,10 +523,10 @@ export default function SystemSettingsPage() {
           <Space direction="vertical" size={6}>
             <Space>
               <SettingOutlined />
-              <Title level={3} style={{ color: '#fff', margin: 0 }}>系统设置</Title>
+              <Title level={3} style={{ color: '#fff', margin: 0 }}>{t('系统设置')}</Title>
             </Space>
             <Paragraph style={{ color: 'rgba(255,255,255,0.88)', margin: 0 }}>
-              仅管理员可见，用于维护 SMTP 发信能力、邮箱注册参数与服务端公告发布。
+              {t('仅管理员可见，用于维护 SMTP 发信能力、邮箱注册参数与服务端公告发布。')}
             </Paragraph>
           </Space>
         </div>
@@ -539,58 +540,58 @@ export default function SystemSettingsPage() {
             label: (
               <Space>
                 <MailOutlined />
-                SMTP 配置
+                {t('SMTP 配置')}
               </Space>
             ),
             children: (
               <Form form={form} layout="vertical" onFinish={handleSave}>
                 <Row gutter={24}>
                   <Col xs={24} xl={16}>
-                    <Card title="邮件服务配置" bordered={false} style={{ borderRadius: 16 }}>
+                    <Card title={t('邮件服务配置')} bordered={false} style={{ borderRadius: 16 }}>
                       <Alert
                         type="info"
                         showIcon
                         style={{ marginBottom: 20 }}
-                        message="QQ 邮箱配置说明"
-                        description="如果选择 QQ 邮箱，请使用完整 QQ 邮箱地址作为用户名，密码处填写 SMTP 授权码，而不是 QQ 登录密码。默认推荐 smtp.qq.com + SSL 465。"
+                        message={t('QQ 邮箱配置说明')}
+                        description={t('如果选择 QQ 邮箱，请使用完整 QQ 邮箱地址作为用户名，密码处填写 SMTP 授权码，而不是 QQ 登录密码。默认推荐 smtp.qq.com + SSL 465。')}
                       />
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_provider" label="邮件服务商" rules={[{ required: true, message: '请选择邮件服务商' }]}>
+                          <Form.Item name="smtp_provider" label={t('邮件服务商')} rules={[{ required: true, message: t('请选择邮件服务商') }]}>
                             <Select onChange={handleProviderChange}>
-                              <Option value="qq">QQ 邮箱</Option>
-                              <Option value="custom">自定义 SMTP</Option>
+                              <Option value="qq">{t('QQ 邮箱')}</Option>
+                              <Option value="custom">{t('自定义 SMTP')}</Option>
                             </Select>
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_host" label="SMTP 主机" rules={[{ required: true, message: '请输入 SMTP 主机' }]}>
-                            <Input placeholder="例如：smtp.qq.com" />
+                          <Form.Item name="smtp_host" label={t('SMTP 主机')} rules={[{ required: true, message: t('请输入 SMTP 主机') }]}>
+                            <Input placeholder={t('例如：smtp.qq.com')} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_port" label="SMTP 端口" rules={[{ required: true, message: '请输入 SMTP 端口' }]}>
+                          <Form.Item name="smtp_port" label={t('SMTP 端口')} rules={[{ required: true, message: t('请输入 SMTP 端口') }]}>
                             <InputNumber style={{ width: '100%' }} min={1} max={65535} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_username" label="SMTP 用户名" rules={[{ required: true, message: '请输入 SMTP 用户名' }]}>
-                            <Input placeholder="完整邮箱地址" />
+                          <Form.Item name="smtp_username" label={t('SMTP 用户名')} rules={[{ required: true, message: t('请输入 SMTP 用户名') }]}>
+                            <Input placeholder={t('完整邮箱地址')} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_password" label="SMTP 密码 / 授权码" rules={[{ required: true, message: '请输入 SMTP 授权码' }]}>
-                            <Input.Password placeholder="QQ 邮箱请填写授权码" />
+                          <Form.Item name="smtp_password" label={t('SMTP 密码 / 授权码')} rules={[{ required: true, message: t('请输入 SMTP 授权码') }]}>
+                            <Input.Password placeholder={t('QQ 邮箱请填写授权码')} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_from_email" label="发件人邮箱">
-                            <Input placeholder="默认可与用户名一致" />
+                          <Form.Item name="smtp_from_email" label={t('发件人邮箱')}>
+                            <Input placeholder={t('默认可与用户名一致')} />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_from_name" label="发件人名称" rules={[{ required: true, message: '请输入发件人名称' }]}>
+                          <Form.Item name="smtp_from_name" label={t('发件人名称')} rules={[{ required: true, message: t('请输入发件人名称') }]}>
                             <Input placeholder="MuMuAINovel" />
                           </Form.Item>
                         </Col>
@@ -598,12 +599,12 @@ export default function SystemSettingsPage() {
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_use_ssl" label="启用 SSL" valuePropName="checked">
+                          <Form.Item name="smtp_use_ssl" label={t('启用 SSL')} valuePropName="checked">
                             <Switch />
                           </Form.Item>
                         </Col>
                         <Col xs={24} md={12}>
-                          <Form.Item name="smtp_use_tls" label="启用 TLS" valuePropName="checked">
+                          <Form.Item name="smtp_use_tls" label={t('启用 TLS')} valuePropName="checked">
                             <Switch />
                           </Form.Item>
                         </Col>
@@ -612,43 +613,43 @@ export default function SystemSettingsPage() {
                   </Col>
 
                   <Col xs={24} xl={8}>
-                    <Card title="注册与验证码策略" bordered={false} style={{ borderRadius: 16, marginBottom: 24 }}>
-                      <Form.Item name="email_auth_enabled" label="启用邮箱认证" valuePropName="checked">
+                    <Card title={t('注册与验证码策略')} bordered={false} style={{ borderRadius: 16, marginBottom: 24 }}>
+                      <Form.Item name="email_auth_enabled" label={t('启用邮箱认证')} valuePropName="checked">
                         <Switch />
                       </Form.Item>
-                      <Form.Item name="email_register_enabled" label="启用邮箱注册" valuePropName="checked">
+                      <Form.Item name="email_register_enabled" label={t('启用邮箱注册')} valuePropName="checked">
                         <Switch />
                       </Form.Item>
-                      <Form.Item name="verification_code_ttl_minutes" label="验证码有效期（分钟）" rules={[{ required: true, message: '请输入验证码有效期' }]}>
+                      <Form.Item name="verification_code_ttl_minutes" label={t('验证码有效期（分钟）')} rules={[{ required: true, message: t('请输入验证码有效期') }]}>
                         <InputNumber style={{ width: '100%' }} min={1} max={120} />
                       </Form.Item>
-                      <Form.Item name="verification_resend_interval_seconds" label="验证码重发间隔（秒）" rules={[{ required: true, message: '请输入验证码重发间隔' }]}>
+                      <Form.Item name="verification_resend_interval_seconds" label={t('验证码重发间隔（秒）')} rules={[{ required: true, message: t('请输入验证码重发间隔') }]}>
                         <InputNumber style={{ width: '100%' }} min={10} max={3600} />
                       </Form.Item>
                     </Card>
 
-                    <Card title="操作" bordered={false} style={{ borderRadius: 16 }}>
+                    <Card title={t('操作')} bordered={false} style={{ borderRadius: 16 }}>
                       <Space direction="vertical" style={{ width: '100%' }} size={12}>
                         <Input
                           value={testTargetEmail}
                           onChange={(e) => setTestTargetEmail(e.target.value)}
-                          placeholder="请输入测试目标邮箱，如 123456@qq.com"
+                          placeholder={t('请输入测试目标邮箱，如 123456@qq.com')}
                         />
                         <Button icon={<ReloadOutlined />} onClick={loadData} block>
-                          重新加载
+                          {t('重新加载')}
                         </Button>
                         <Button icon={<SendOutlined />} loading={testing} onClick={handleTest} block>
-                          发送测试邮件
+                          {t('发送测试邮件')}
                         </Button>
                         <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={saving} block onClick={() => form.submit()}>
-                          保存系统设置
+                          {t('保存系统设置')}
                         </Button>
                         <Alert
                           type="success"
                           showIcon
                           icon={<CheckCircleOutlined />}
-                          message="建议使用 QQ 默认配置"
-                          description={<Text type="secondary">先保存 SMTP 配置，再填写测试目标邮箱，点击“发送测试邮件”后由后端通过 SMTP 实际发信。</Text>}
+                          message={t('建议使用 QQ 默认配置')}
+                          description={<Text type="secondary">{t('先保存 SMTP 配置，再填写测试目标邮箱，点击“发送测试邮件”后由后端通过 SMTP 实际发信。')}</Text>}
                         />
                       </Space>
                     </Card>
@@ -662,7 +663,7 @@ export default function SystemSettingsPage() {
             label: (
               <Space>
                 <BellOutlined />
-                公告管理
+                {t('公告管理')}
               </Space>
             ),
             children: (
@@ -671,24 +672,24 @@ export default function SystemSettingsPage() {
                   <Alert
                     type={announcementAdminAvailable ? 'info' : 'warning'}
                     showIcon
-                    message={announcementAdminAvailable ? '公告发布入口' : '当前实例不是公告发布端'}
+                    message={announcementAdminAvailable ? t('公告发布入口') : t('当前实例不是公告发布端')}
                     description={announcementAdminAvailable
-                      ? '公告只能由服务端模式下的管理员发布、编辑、隐藏或删除；客户端实例会定时从服务端同步已发布且未过期的公告。'
-                      : `公告发布仅在云端服务端可用。当前模式：${announcementStatus?.mode || '未知'}${announcementStatus?.cloud_url ? `，云端地址：${announcementStatus.cloud_url}` : ''}`}
+                      ? t('公告只能由服务端模式下的管理员发布、编辑、隐藏或删除；客户端实例会定时从服务端同步已发布且未过期的公告。')
+                      : t('公告发布仅在云端服务端可用。当前模式：{{v1}}{{v2}}', { v1: announcementStatus?.mode || t('未知'), v2: announcementStatus?.cloud_url ? t('，云端地址：{{cloud_url}}', { cloud_url: announcementStatus.cloud_url }) : '' })}
                   />
 
                   <Row gutter={[16, 16]} justify="space-between" align="middle">
                     <Col xs={24} lg={14}>
                       <Space wrap>
                         <Button type="primary" icon={<PlusOutlined />} disabled={!announcementAdminAvailable} onClick={openCreateAnnouncementModal}>
-                          新建公告
+                          {t('新建公告')}
                         </Button>
                         <Button icon={<ReloadOutlined />} loading={announcementLoading || announcementStatusLoading} onClick={() => { void loadAnnouncementStatus(); void loadAnnouncements(announcementPagination.current, announcementPagination.pageSize, announcementSearchKeyword); }}>
-                          刷新列表
+                          {t('刷新列表')}
                         </Button>
                         {announcementStatus && (
                           <Tag color={announcementAdminAvailable ? 'green' : 'orange'}>
-                            {announcementStatus.mode === 'server' ? '服务端模式' : '客户端模式'}
+                            {announcementStatus.mode === 'server' ? t('服务端模式') : t('客户端模式')}
                           </Tag>
                         )}
                       </Space>
@@ -697,12 +698,12 @@ export default function SystemSettingsPage() {
                       <Space wrap>
                         <Search
                           allowClear
-                          placeholder="搜索标题、摘要或正文"
+                          placeholder={t('搜索标题、摘要或正文')}
                           style={{ width: 220 }}
                           onSearch={handleAnnouncementSearch}
                           disabled={!announcementAdminAvailable}
                         />
-                        <Text type="secondary">状态</Text>
+                        <Text type="secondary">{t('状态')}</Text>
                         <Select<AnnouncementStatusFilter>
                           style={{ width: 120, textAlign: 'left' }}
                           value={announcementStatusFilter}
@@ -712,10 +713,10 @@ export default function SystemSettingsPage() {
                             setAnnouncementPagination(prev => ({ ...prev, current: 1 }));
                           }}
                           options={[
-                            { label: '全部', value: 'all' },
-                            { label: '草稿', value: 'draft' },
-                            { label: '已发布', value: 'published' },
-                            { label: '已隐藏', value: 'hidden' },
+                            { label: t('全部'), value: 'all' },
+                            { label: t('草稿'), value: 'draft' },
+                            { label: t('已发布'), value: 'published' },
+                            { label: t('已隐藏'), value: 'hidden' },
                           ]}
                         />
                       </Space>
@@ -732,7 +733,7 @@ export default function SystemSettingsPage() {
                       pageSize: announcementPagination.pageSize,
                       total: announcementPagination.total,
                       showSizeChanger: true,
-                      showTotal: (total) => `共 ${total} 条公告`,
+                      showTotal: (total) => t('共 {{total}} 条公告', { total }),
                     }}
                     onChange={handleAnnouncementTableChange}
                     scroll={{ x: 1200 }}
@@ -746,13 +747,13 @@ export default function SystemSettingsPage() {
       </div>
 
       <Modal
-        title={editingAnnouncement ? '编辑公告' : '新建公告'}
+        title={editingAnnouncement ? t('编辑公告') : t('新建公告')}
         open={announcementModalOpen}
         onCancel={closeAnnouncementModal}
         onOk={() => announcementForm.submit()}
         confirmLoading={announcementSaving}
-        okText={editingAnnouncement ? '保存修改' : '创建公告'}
-        cancelText="取消"
+        okText={editingAnnouncement ? t('保存修改') : t('创建公告')}
+        cancelText={t('取消')}
         width={1200}
         destroyOnClose
       >
@@ -761,81 +762,81 @@ export default function SystemSettingsPage() {
             <Col xs={24} md={16}>
               <Form.Item
                 name="title"
-                label="公告标题"
+                label={t('公告标题')}
                 rules={[
-                  { required: true, message: '请输入公告标题' },
-                  { max: 120, message: '公告标题不能超过 120 个字符' },
-                  { whitespace: true, message: '公告标题不能为空白字符' },
+                  { required: true, message: t('请输入公告标题') },
+                  { max: 120, message: t('公告标题不能超过 120 个字符') },
+                  { whitespace: true, message: t('公告标题不能为空白字符') },
                 ]}
               >
-                <Input placeholder="请输入公告标题" maxLength={120} showCount />
+                <Input placeholder={t('请输入公告标题')} maxLength={120} showCount />
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
-              <Form.Item name="level" label="公告级别" rules={[{ required: true, message: '请选择公告级别' }]}>
+              <Form.Item name="level" label={t('公告级别')} rules={[{ required: true, message: t('请选择公告级别') }]}>
                 <Select>
-                  <Option value="info">通知</Option>
-                  <Option value="success">成功</Option>
-                  <Option value="warning">警告</Option>
-                  <Option value="error">重要</Option>
+                  <Option value="info">{t('通知')}</Option>
+                  <Option value="success">{t('成功')}</Option>
+                  <Option value="warning">{t('警告')}</Option>
+                  <Option value="error">{t('重要')}</Option>
                 </Select>
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item name="summary" label="摘要" rules={[{ max: 255, message: '摘要不能超过 255 个字符' }]}>
-            <Input placeholder="可选，用于列表和时间轴的简短说明" maxLength={255} showCount />
+          <Form.Item name="summary" label={t('摘要')} rules={[{ max: 255, message: t('摘要不能超过 255 个字符') }]}>
+            <Input placeholder={t('可选，用于列表和时间轴的简短说明')} maxLength={255} showCount />
           </Form.Item>
 
           <Card
             size="small"
-            title="公告正文（Markdown / 安全 HTML）"
+            title={t('公告正文（Markdown / 安全 HTML）')}
             style={{ marginBottom: 24, borderRadius: 12 }}
-            extra={<Text type="secondary">支持 Markdown，以及居中图片、换行、强调等安全 HTML</Text>}
+            extra={<Text type="secondary">{t('支持 Markdown，以及居中图片、换行、强调等安全 HTML')}</Text>}
           >
             <Space direction="vertical" size={12} style={{ width: '100%' }}>
               <Space wrap>
-                <Button size="small" onClick={() => appendMarkdownSnippet('## 小标题')}>标题</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('**重点内容**')}>粗体</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('- 列表项\n- 列表项')}>列表</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('> 引用说明')}>引用</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('[链接文字](https://example.com)')}>链接</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('<p align="center">\n  <img src="https://avatars.githubusercontent.com/u/283105808?s=48&v=4" alt="DolOffer Logo" width="200"/>\n  <br>\n  <em>专注于优质数字产品推荐与超值优惠分享的领先平台</em>\n</p>')}>居中图片</Button>
-                <Button size="small" onClick={() => appendMarkdownSnippet('```\n代码内容\n```')}>代码块</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('## 小标题'))}>{t('标题')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('**重点内容**'))}>{t('粗体')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('- 列表项\n- 列表项'))}>{t('列表')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('> 引用说明'))}>{t('引用')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('[链接文字](https://example.com)'))}>{t('链接')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('<p align="center">\n  <img src="https://avatars.githubusercontent.com/u/283105808?s=48&v=4" alt="DolOffer Logo" width="200"/>\n  <br>\n  <em>专注于优质数字产品推荐与超值优惠分享的领先平台</em>\n</p>'))}>{t('居中图片')}</Button>
+                <Button size="small" onClick={() => appendMarkdownSnippet(t('```\n代码内容\n```'))}>{t('代码块')}</Button>
               </Space>
 
               <Row gutter={16}>
                 <Col xs={24} lg={12}>
                   <Form.Item
                     name="content"
-                    label="编辑"
+                    label={t('编辑')}
                     rules={[
-                      { required: true, message: '请输入公告正文' },
-                      { whitespace: true, message: '公告正文不能为空白字符' },
+                      { required: true, message: t('请输入公告正文') },
+                      { whitespace: true, message: t('公告正文不能为空白字符') },
                     ]}
                     style={{ marginBottom: 0 }}
                   >
                     <TextArea
                       style={{ height: 420, resize: 'vertical' }}
                       placeholder={[
-                        '请输入 Markdown 或安全 HTML 公告内容，例如：',
-                        '## 更新说明',
-                        '- 支持列表',
-                        '- 支持 **重点内容**',
-                        '> 支持引用说明',
-                        '[查看详情](https://example.com)',
+                        t('请输入 Markdown 或安全 HTML 公告内容，例如：'),
+                        t('## 更新说明'),
+                        t('- 支持列表'),
+                        t('- 支持 **重点内容**'),
+                        t('> 支持引用说明'),
+                        t('[查看详情](https://example.com)'),
                         '',
                         '<p align="center">',
                         '  <img src="https://avatars.githubusercontent.com/u/283105808?s=48&v=4" alt="DolOffer Logo" width="200"/>',
                         '  <br>',
-                        '  <em>专注于优质数字产品推荐与超值优惠分享的领先平台</em>',
+                        t('  <em>专注于优质数字产品推荐与超值优惠分享的领先平台</em>'),
                         '</p>',
                       ].join('\n')}
                     />
                   </Form.Item>
                 </Col>
                 <Col xs={24} lg={12}>
-                  <Text strong>预览</Text>
+                  <Text strong>{t('预览')}</Text>
                   <div
                     style={{
                       marginTop: 8,
@@ -857,23 +858,23 @@ export default function SystemSettingsPage() {
 
           <Row gutter={16}>
             <Col xs={24} md={8}>
-              <Form.Item name="status" label="发布状态" rules={[{ required: true, message: '请选择发布状态' }]}>
+              <Form.Item name="status" label={t('发布状态')} rules={[{ required: true, message: t('请选择发布状态') }]}>
                 <Select>
-                  <Option value="draft">草稿</Option>
-                  <Option value="published">立即发布</Option>
-                  <Option value="hidden">隐藏</Option>
+                  <Option value="draft">{t('草稿')}</Option>
+                  <Option value="published">{t('立即发布')}</Option>
+                  <Option value="hidden">{t('隐藏')}</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
-              <Form.Item name="publish_at" label="发布时间">
+              <Form.Item name="publish_at" label={t('发布时间')}>
                 <DatePicker style={{ width: '100%' }} showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" allowClear />
               </Form.Item>
             </Col>
             <Col xs={24} md={8}>
               <Form.Item
                 name="expire_at"
-                label="过期时间"
+                label={t('过期时间')}
                 dependencies={['publish_at']}
                 rules={[
                   ({ getFieldValue }) => ({
@@ -882,7 +883,7 @@ export default function SystemSettingsPage() {
                       if (!value || !publishAt || value.isAfter(publishAt)) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error('过期时间必须晚于发布时间'));
+                      return Promise.reject(new Error(t('过期时间必须晚于发布时间')));
                     },
                   }),
                 ]}
@@ -892,7 +893,7 @@ export default function SystemSettingsPage() {
             </Col>
           </Row>
 
-          <Form.Item name="pinned" label="置顶公告" valuePropName="checked" extra="置顶公告会优先展示在客户端公告时间轴顶部。">
+          <Form.Item name="pinned" label={t('置顶公告')} valuePropName="checked" extra={t('置顶公告会优先展示在客户端公告时间轴顶部。')}>
             <Switch />
           </Form.Item>
         </Form>

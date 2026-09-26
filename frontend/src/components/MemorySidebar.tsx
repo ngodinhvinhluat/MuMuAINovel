@@ -7,6 +7,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import type { MemoryAnnotation } from './AnnotatedText';
+import { t } from '../i18n';
 
 const { Panel } = Collapse;
 
@@ -20,19 +21,19 @@ interface MemorySidebarProps {
 // 类型配置
 const TYPE_CONFIG = {
   hook: {
-    label: '钩子',
+    label: t('钩子'),
     icon: <FireOutlined />,
   },
   foreshadow: {
-    label: '伏笔',
+    label: t('伏笔'),
     icon: <StarOutlined />,
   },
   plot_point: {
-    label: '情节点',
+    label: t('情节点'),
     icon: <ThunderboltOutlined />,
   },
   character_event: {
-    label: '角色事件',
+    label: t('角色事件'),
     icon: <UserOutlined />,
   },
 };
@@ -165,7 +166,7 @@ const MemorySidebar: React.FC<MemorySidebarProps> = ({
         {/* 特殊元数据 */}
         {annotation.metadata.strength && (
           <div style={{ marginTop: 4, fontSize: 11, color: token.colorTextTertiary }}>
-            强度: {annotation.metadata.strength}/10
+            {t('强度: {{strength}}/10', { strength: annotation.metadata.strength })}
           </div>
         )}
         {annotation.metadata.foreshadowType && (
@@ -173,7 +174,7 @@ const MemorySidebar: React.FC<MemorySidebarProps> = ({
             color={annotation.metadata.foreshadowType === 'planted' ? 'blue' : 'green'}
             style={{ marginTop: 4 }}
           >
-            {annotation.metadata.foreshadowType === 'planted' ? '已埋下' : '已回收'}
+            {annotation.metadata.foreshadowType === 'planted' ? t('已埋下') : t('已回收')}
           </Tag>
         )}
         </Card>
@@ -184,7 +185,7 @@ const MemorySidebar: React.FC<MemorySidebarProps> = ({
   if (annotations.length === 0) {
     return (
       <div style={{ padding: 24 }}>
-        <Empty description="暂无分析数据" />
+        <Empty description={t('暂无分析数据')} />
       </div>
     );
   }
@@ -193,28 +194,28 @@ const MemorySidebar: React.FC<MemorySidebarProps> = ({
     <div style={{ height: '100%', overflowY: 'auto', padding: '16px' }}>
       {/* 统计概览 */}
       <Card size="small" style={{ marginBottom: 16 }}>
-        <div style={{ fontWeight: 600, marginBottom: 12 }}>📊 分析概览</div>
+        <div style={{ fontWeight: 600, marginBottom: 12 }}>{t('📊 分析概览')}</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <div>
-            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>钩子</div>
+            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>{t('钩子')}</div>
             <div style={{ fontSize: 20, fontWeight: 600, color: typeColors.hook }}>
               {stats.hooks}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>伏笔</div>
+            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>{t('伏笔')}</div>
             <div style={{ fontSize: 20, fontWeight: 600, color: typeColors.foreshadow }}>
               {stats.foreshadows}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>情节点</div>
+            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>{t('情节点')}</div>
             <div style={{ fontSize: 20, fontWeight: 600, color: typeColors.plot_point }}>
               {stats.plotPoints}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>角色事件</div>
+            <div style={{ fontSize: 12, color: token.colorTextTertiary }}>{t('角色事件')}</div>
             <div
               style={{ fontSize: 20, fontWeight: 600, color: typeColors.character_event }}
             >

@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 /**
  * 应用版本信息配置
  * 版本号遵循语义化版本规范 (Semantic Versioning)
@@ -14,7 +15,7 @@ export const VERSION_INFO = {
   
   // 项目信息
   projectName: 'MuMuAINovel',
-  projectFullName: 'MuMu AI 小说创作助手',
+  projectFullName: t('MuMu AI 小说创作助手'),
   
   // 链接信息
   githubUrl: 'https://github.com/xiamuceer-j/MuMuAINovel',

@@ -18,28 +18,29 @@ import type {
   ForeshadowStatus, ForeshadowCategory, Chapter, Character
 } from '../types';
 import { eventBus, EventNames } from '../store/eventBus';
+import { t } from '../i18n';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 // 状态配置
 const STATUS_CONFIG: Record<ForeshadowStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: '待埋入', color: 'default', icon: <ClockCircleOutlined /> },
-  planted: { label: '已埋入', color: 'green', icon: <BulbOutlined /> },
-  resolved: { label: '已回收', color: 'blue', icon: <CheckCircleOutlined /> },
-  partially_resolved: { label: '部分回收', color: 'orange', icon: <ExclamationCircleOutlined /> },
-  abandoned: { label: '已废弃', color: 'default', icon: <CloseCircleOutlined /> },
+  pending: { label: t('待埋入'), color: 'default', icon: <ClockCircleOutlined /> },
+  planted: { label: t('已埋入'), color: 'green', icon: <BulbOutlined /> },
+  resolved: { label: t('已回收'), color: 'blue', icon: <CheckCircleOutlined /> },
+  partially_resolved: { label: t('部分回收'), color: 'orange', icon: <ExclamationCircleOutlined /> },
+  abandoned: { label: t('已废弃'), color: 'default', icon: <CloseCircleOutlined /> },
 };
 
 // 分类配置
 const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
-  identity: { label: '身世', color: 'purple' },
-  mystery: { label: '悬念', color: 'magenta' },
-  item: { label: '物品', color: 'gold' },
-  relationship: { label: '关系', color: 'cyan' },
-  event: { label: '事件', color: 'blue' },
-  ability: { label: '能力', color: 'green' },
-  prophecy: { label: '预言', color: 'volcano' },
+  identity: { label: t('身世'), color: 'purple' },
+  mystery: { label: t('悬念'), color: 'magenta' },
+  item: { label: t('物品'), color: 'gold' },
+  relationship: { label: t('关系'), color: 'cyan' },
+  event: { label: t('事件'), color: 'blue' },
+  ability: { label: t('能力'), color: 'green' },
+  prophecy: { label: t('预言'), color: 'volcano' },
 };
 
 export default function Foreshadows() {
@@ -192,13 +193,13 @@ export default function Foreshadows() {
     try {
       if (currentForeshadow) {
         await foreshadowApi.updateForeshadow(currentForeshadow.id, values as ForeshadowUpdate);
-        message.success('伏笔更新成功');
+        message.success(t('伏笔更新成功'));
       } else {
         await foreshadowApi.createForeshadow({
           ...values,
           project_id: projectId!,
         } as ForeshadowCreate);
-        message.success('伏笔创建成功');
+        message.success(t('伏笔创建成功'));
       }
       setEditModalVisible(false);
       form.resetFields();
@@ -213,7 +214,7 @@ export default function Foreshadows() {
   const handleDelete = async (id: string) => {
     try {
       await foreshadowApi.deleteForeshadow(id);
-      message.success('伏笔删除成功');
+      message.success(t('伏笔删除成功'));
       loadForeshadows();
     } catch (error) {
       console.error('删除伏笔失败:', error);
@@ -233,7 +234,7 @@ export default function Foreshadows() {
         chapter_number: chapter.chapter_number,
         hint_text: values.hint_text,
       });
-      message.success('伏笔已标记为埋入');
+      message.success(t('伏笔已标记为埋入'));
       setPlantModalVisible(false);
       plantForm.resetFields();
       setCurrentForeshadow(null);
@@ -257,7 +258,7 @@ export default function Foreshadows() {
         resolution_text: values.resolution_text,
         is_partial: values.is_partial,
       });
-      message.success('伏笔已标记为回收');
+      message.success(t('伏笔已标记为回收'));
       setResolveModalVisible(false);
       resolveForm.resetFields();
       setCurrentForeshadow(null);
@@ -271,7 +272,7 @@ export default function Foreshadows() {
   const handleAbandon = async (id: string) => {
     try {
       await foreshadowApi.abandonForeshadow(id);
-      message.success('伏笔已标记为废弃');
+      message.success(t('伏笔已标记为废弃'));
       loadForeshadows();
     } catch (error) {
       console.error('标记废弃失败:', error);
@@ -287,7 +288,7 @@ export default function Foreshadows() {
       const result = await foreshadowApi.syncFromAnalysis(projectId, {
         auto_set_planted: true,
       });
-      message.success(`同步完成: 新增${result.synced_count}个伏笔, 跳过${result.skipped_count}个`);
+      message.success(t('同步完成: 新增{{synced_count}}个伏笔, 跳过{{skipped_count}}个', { synced_count: result.synced_count, skipped_count: result.skipped_count }));
       setSyncModalVisible(false);
       loadForeshadows();
     } catch (error) {
@@ -347,9 +348,9 @@ export default function Foreshadows() {
     const remaining = foreshadow.target_resolve_chapter_number - currentMaxChapter;
     
     if (remaining < 0) {
-      return <Badge status="error" text={`已超期${Math.abs(remaining)}章`} />;
+      return <Badge status="error" text={t('已超期{{v1}}章', { v1: Math.abs(remaining) })} />;
     } else if (remaining <= 3) {
-      return <Badge status="warning" text={`还剩${remaining}章`} />;
+      return <Badge status="warning" text={t('还剩{{remaining}}章', { remaining })} />;
     }
     return null;
   };
@@ -366,7 +367,7 @@ export default function Foreshadows() {
   // 表格列定义
   const columns = [
     {
-      title: '状态',
+      title: t('状态'),
       dataIndex: 'status',
       key: 'status',
       width: 100,
@@ -381,7 +382,7 @@ export default function Foreshadows() {
       },
     },
     {
-      title: '标题',
+      title: t('标题'),
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
@@ -391,7 +392,7 @@ export default function Foreshadows() {
           <Space>
             <a onClick={() => openDetailModal(record)}>{title}</a>
             {record.is_long_term && (
-              <Tag color="purple" style={{ marginLeft: 4 }}>长线</Tag>
+              <Tag color="purple" style={{ marginLeft: 4 }}>{t('长线')}</Tag>
             )}
           </Space>
           {getUrgencyBadge(record)}
@@ -399,7 +400,7 @@ export default function Foreshadows() {
       ),
     },
     {
-      title: '分类',
+      title: t('分类'),
       dataIndex: 'category',
       key: 'category',
       width: 80,
@@ -415,7 +416,7 @@ export default function Foreshadows() {
       },
     },
     {
-      title: '埋入章节',
+      title: t('埋入章节'),
       dataIndex: 'plant_chapter_number',
       key: 'plant_chapter_number',
       width: 120,
@@ -425,10 +426,10 @@ export default function Foreshadows() {
         return valA - valB;
       },
       defaultSortOrder: 'ascend' as const,
-      render: (num?: number) => num ? `第${num}章` : '-',
+      render: (num?: number) => num ? t('第{{num}}章', { num }) : '-',
     },
     {
-      title: '计划回收',
+      title: t('计划回收'),
       dataIndex: 'target_resolve_chapter_number',
       key: 'target_resolve_chapter_number',
       width: 120,
@@ -437,10 +438,10 @@ export default function Foreshadows() {
         const valB = b.target_resolve_chapter_number ?? 999999;
         return valA - valB;
       },
-      render: (num?: number) => num ? `第${num}章` : '-',
+      render: (num?: number) => num ? t('第{{num}}章', { num }) : '-',
     },
     {
-      title: '重要性',
+      title: t('重要性'),
       dataIndex: 'importance',
       key: 'importance',
       width: 100,
@@ -451,7 +452,7 @@ export default function Foreshadows() {
       },
     },
     {
-      title: '来源',
+      title: t('来源'),
       dataIndex: 'source_type',
       key: 'source_type',
       width: 80,
@@ -462,47 +463,47 @@ export default function Foreshadows() {
       },
       render: (source?: string) => (
         <Tag color={source === 'analysis' ? 'blue' : 'green'}>
-          {source === 'analysis' ? '分析' : '手动'}
+          {source === 'analysis' ? t('分析') : t('手动')}
         </Tag>
       ),
     },
     {
-      title: '操作',
+      title: t('操作'),
       key: 'actions',
       width: 200,
       render: (_: unknown, record: Foreshadow) => (
         <Space size="small">
-          <Tooltip title="查看详情">
+          <Tooltip title={t('查看详情')}>
             <Button type="text" size="small" icon={<EyeOutlined />} onClick={() => openDetailModal(record)} />
           </Tooltip>
-          <Tooltip title="编辑">
+          <Tooltip title={t('编辑')}>
             <Button type="text" size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)} />
           </Tooltip>
           {record.status === 'pending' && (
-            <Tooltip title="标记埋入">
+            <Tooltip title={t('标记埋入')}>
               <Button type="text" size="small" icon={<FlagOutlined />} onClick={() => openPlantModal(record)} />
             </Tooltip>
           )}
           {record.status === 'planted' && (
-            <Tooltip title="标记回收">
+            <Tooltip title={t('标记回收')}>
               <Button type="text" size="small" icon={<CheckCircleOutlined />} onClick={() => openResolveModal(record)} />
             </Tooltip>
           )}
           {record.status !== 'abandoned' && record.status !== 'resolved' && (
             <Popconfirm
-              title="确定要废弃这个伏笔吗？"
+              title={t('确定要废弃这个伏笔吗？')}
               onConfirm={() => handleAbandon(record.id)}
             >
-              <Tooltip title="废弃">
+              <Tooltip title={t('废弃')}>
                 <Button type="text" size="small" danger icon={<CloseCircleOutlined />} />
               </Tooltip>
             </Popconfirm>
           )}
           <Popconfirm
-            title="确定要删除这个伏笔吗？"
+            title={t('确定要删除这个伏笔吗？')}
             onConfirm={() => handleDelete(record.id)}
           >
-            <Tooltip title="删除">
+            <Tooltip title={t('删除')}>
               <Button type="text" size="small" danger icon={<DeleteOutlined />} />
             </Tooltip>
           </Popconfirm>
@@ -518,33 +519,33 @@ export default function Foreshadows() {
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={3}>
             <Card size="small">
-              <Statistic title="总计" value={stats.total} />
+              <Statistic title={t('总计')} value={stats.total} />
             </Card>
           </Col>
           <Col span={3}>
             <Card size="small">
-              <Statistic title="待埋入" value={stats.pending} valueStyle={{ color: token.colorTextSecondary }} />
+              <Statistic title={t('待埋入')} value={stats.pending} valueStyle={{ color: token.colorTextSecondary }} />
             </Card>
           </Col>
           <Col span={3}>
             <Card size="small">
-              <Statistic title="已埋入" value={stats.planted} valueStyle={{ color: token.colorSuccess }} />
+              <Statistic title={t('已埋入')} value={stats.planted} valueStyle={{ color: token.colorSuccess }} />
             </Card>
           </Col>
           <Col span={3}>
             <Card size="small">
-              <Statistic title="已回收" value={stats.resolved} valueStyle={{ color: token.colorPrimary }} />
+              <Statistic title={t('已回收')} value={stats.resolved} valueStyle={{ color: token.colorPrimary }} />
             </Card>
           </Col>
           <Col span={3}>
             <Card size="small">
-              <Statistic title="长线伏笔" value={stats.long_term_count} valueStyle={{ color: token.colorInfo }} />
+              <Statistic title={t('长线伏笔')} value={stats.long_term_count} valueStyle={{ color: token.colorInfo }} />
             </Card>
           </Col>
           <Col span={3}>
             <Card size="small">
               <Statistic 
-                title="超期未回收" 
+                title={t('超期未回收')} 
                 value={stats.overdue_count} 
                 valueStyle={{ color: stats.overdue_count > 0 ? token.colorError : token.colorTextSecondary }}
                 prefix={stats.overdue_count > 0 ? <WarningOutlined /> : null}
@@ -557,8 +558,8 @@ export default function Foreshadows() {
       {/* 超期提醒 */}
       {stats && stats.overdue_count > 0 && (
         <Alert
-          message={`有 ${stats.overdue_count} 个伏笔已超期未回收`}
-          description="请尽快在后续章节中回收这些伏笔，或调整计划回收章节"
+          message={t('有 {{overdue_count}} 个伏笔已超期未回收', { overdue_count: stats.overdue_count })}
+          description={t('请尽快在后续章节中回收这些伏笔，或调整计划回收章节')}
           type="warning"
           showIcon
           style={{ marginBottom: 16 }}
@@ -570,7 +571,7 @@ export default function Foreshadows() {
         message={
           <Space>
             <InfoCircleOutlined />
-            <span>伏笔数据会在章节分析完成后自动同步，无需手动操作</span>
+            <span>{t('伏笔数据会在章节分析完成后自动同步，无需手动操作')}</span>
           </Space>
         }
         type="info"
@@ -583,7 +584,7 @@ export default function Foreshadows() {
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Space>
           <Select
-            placeholder="状态筛选"
+            placeholder={t('状态筛选')}
             allowClear
             style={{ width: 120 }}
             value={statusFilter}
@@ -594,7 +595,7 @@ export default function Foreshadows() {
             ))}
           </Select>
           <Select
-            placeholder="分类筛选"
+            placeholder={t('分类筛选')}
             allowClear
             style={{ width: 100 }}
             value={categoryFilter}
@@ -605,18 +606,18 @@ export default function Foreshadows() {
             ))}
           </Select>
           <Select
-            placeholder="来源筛选"
+            placeholder={t('来源筛选')}
             allowClear
             style={{ width: 100 }}
             value={sourceFilter}
             onChange={setSourceFilter}
           >
-            <Option value="analysis">分析</Option>
-            <Option value="manual">手动</Option>
+            <Option value="analysis">{t('分析')}</Option>
+            <Option value="manual">{t('手动')}</Option>
           </Select>
         </Space>
         <Space>
-          <Tooltip title="刷新列表">
+          <Tooltip title={t('刷新列表')}>
             <Button
               icon={<ReloadOutlined spin={loading} />}
               onClick={loadForeshadows}
@@ -628,21 +629,21 @@ export default function Foreshadows() {
                 {
                   key: 'sync',
                   icon: <SyncOutlined />,
-                  label: '手动同步分析伏笔',
+                  label: t('手动同步分析伏笔'),
                   onClick: () => setSyncModalVisible(true),
                 },
               ] as MenuProps['items'],
             }}
             placement="bottomRight"
           >
-            <Button icon={<MoreOutlined />}>更多</Button>
+            <Button icon={<MoreOutlined />}>{t('更多')}</Button>
           </Dropdown>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => openEditModal()}
           >
-            添加伏笔
+            {t('添加伏笔')}
           </Button>
         </Space>
       </div>
@@ -666,7 +667,7 @@ export default function Foreshadows() {
           pagination={false}
           scroll={{ y: tableScrollY }}
           locale={{
-            emptyText: <Empty description="暂无伏笔，点击右上角添加" />,
+            emptyText: <Empty description={t('暂无伏笔，点击右上角添加')} />,
           }}
         />
       </div>
@@ -692,14 +693,14 @@ export default function Foreshadows() {
             }
           }}
           showSizeChanger
-          showTotal={(total) => `共 ${total} 条`}
+          showTotal={(total) => t('共 {{total}} 条', { total })}
           showQuickJumper
         />
       </div>
 
       {/* 创建/编辑模态框 */}
       <Modal
-        title={currentForeshadow ? '编辑伏笔' : '添加伏笔'}
+        title={currentForeshadow ? t('编辑伏笔') : t('添加伏笔')}
         open={editModalVisible}
         centered
         onCancel={() => {
@@ -727,13 +728,13 @@ export default function Foreshadows() {
         >
           <Row gutter={16}>
             <Col span={16}>
-              <Form.Item name="title" label="伏笔标题" rules={[{ required: true, message: '请输入标题' }]}>
-                <Input placeholder="简洁描述伏笔内容" maxLength={200} />
+              <Form.Item name="title" label={t('伏笔标题')} rules={[{ required: true, message: t('请输入标题') }]}>
+                <Input placeholder={t('简洁描述伏笔内容')} maxLength={200} />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="category" label="分类">
-                <Select placeholder="选择分类" allowClear>
+              <Form.Item name="category" label={t('分类')}>
+                <Select placeholder={t('选择分类')} allowClear>
                   {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
                     <Option key={key} value={key}>{config.label}</Option>
                   ))}
@@ -742,26 +743,26 @@ export default function Foreshadows() {
             </Col>
           </Row>
           
-          <Form.Item name="content" label="伏笔内容" rules={[{ required: true, message: '请输入内容' }]}>
-            <TextArea rows={3} placeholder="详细描述伏笔的内容和意图" />
+          <Form.Item name="content" label={t('伏笔内容')} rules={[{ required: true, message: t('请输入内容') }]}>
+            <TextArea rows={3} placeholder={t('详细描述伏笔的内容和意图')} />
           </Form.Item>
           
           <Row gutter={16}>
             <Col span={6}>
-              <Form.Item name="plant_chapter_number" label="计划埋入">
-                <InputNumber min={1} placeholder="章节号" style={{ width: '100%' }} />
+              <Form.Item name="plant_chapter_number" label={t('计划埋入')}>
+                <InputNumber min={1} placeholder={t('章节号')} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="target_resolve_chapter_number" label="计划回收">
-                <InputNumber min={1} placeholder="章节号" style={{ width: '100%' }} />
+              <Form.Item name="target_resolve_chapter_number" label={t('计划回收')}>
+                <InputNumber min={1} placeholder={t('章节号')} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="related_characters" label="关联角色">
+              <Form.Item name="related_characters" label={t('关联角色')}>
                 <Select
                   mode="multiple"
-                  placeholder="选择关联角色"
+                  placeholder={t('选择关联角色')}
                   optionFilterProp="children"
                   maxTagCount={3}
                 >
@@ -779,55 +780,55 @@ export default function Foreshadows() {
           
           <Row gutter={16}>
             <Col span={6}>
-              <Form.Item name="importance" label="重要性 (0-1)">
+              <Form.Item name="importance" label={t('重要性 (0-1)')}>
                 <InputNumber min={0} max={1} step={0.1} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="strength" label="强度 (1-10)">
+              <Form.Item name="strength" label={t('强度 (1-10)')}>
                 <InputNumber min={1} max={10} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="subtlety" label="隐藏度 (1-10)">
+              <Form.Item name="subtlety" label={t('隐藏度 (1-10)')}>
                 <InputNumber min={1} max={10} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="is_long_term" label="长线伏笔" valuePropName="checked">
-                <Switch checkedChildren="是" unCheckedChildren="否" />
+              <Form.Item name="is_long_term" label={t('长线伏笔')} valuePropName="checked">
+                <Switch checkedChildren={t('是')} unCheckedChildren={t('否')} />
               </Form.Item>
             </Col>
           </Row>
           
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="hint_text" label="暗示文本">
-                <TextArea rows={2} placeholder="埋伏笔时使用的暗示性描写" />
+              <Form.Item name="hint_text" label={t('暗示文本')}>
+                <TextArea rows={2} placeholder={t('埋伏笔时使用的暗示性描写')} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="notes" label="备注">
-                <TextArea rows={2} placeholder="创作备注（仅作者可见）" />
+              <Form.Item name="notes" label={t('备注')}>
+                <TextArea rows={2} placeholder={t('创作备注（仅作者可见）')} />
               </Form.Item>
             </Col>
           </Row>
           
-          <Divider style={{ margin: '12px 0' }}>AI辅助设置</Divider>
+          <Divider style={{ margin: '12px 0' }}>{t('AI辅助设置')}</Divider>
           
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item name="auto_remind" label="自动提醒" valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Switch checkedChildren="开" unCheckedChildren="关" />
+              <Form.Item name="auto_remind" label={t('自动提醒')} valuePropName="checked" style={{ marginBottom: 0 }}>
+                <Switch checkedChildren={t('开')} unCheckedChildren={t('关')} />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="include_in_context" label="包含在生成上下文" valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Switch checkedChildren="是" unCheckedChildren="否" />
+              <Form.Item name="include_in_context" label={t('包含在生成上下文')} valuePropName="checked" style={{ marginBottom: 0 }}>
+                <Switch checkedChildren={t('是')} unCheckedChildren={t('否')} />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="remind_before_chapters" label="提前几章提醒" style={{ marginBottom: 0 }}>
+              <Form.Item name="remind_before_chapters" label={t('提前几章提醒')} style={{ marginBottom: 0 }}>
                 <InputNumber min={1} max={20} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
@@ -837,7 +838,7 @@ export default function Foreshadows() {
 
       {/* 详情模态框 */}
       <Modal
-        title="伏笔详情"
+        title={t('伏笔详情')}
         open={detailModalVisible}
         centered
         onCancel={() => {
@@ -846,13 +847,13 @@ export default function Foreshadows() {
         }}
         footer={[
           <Button key="close" onClick={() => setDetailModalVisible(false)}>
-            关闭
+            {t('关闭')}
           </Button>,
           <Button key="edit" type="primary" onClick={() => {
             setDetailModalVisible(false);
             openEditModal(currentForeshadow!);
           }}>
-            编辑
+            {t('编辑')}
           </Button>,
         ]}
         width={600}
@@ -866,7 +867,7 @@ export default function Foreshadows() {
                   <Tag color={STATUS_CONFIG[currentForeshadow.status].color}>
                     {STATUS_CONFIG[currentForeshadow.status].label}
                   </Tag>
-                  {currentForeshadow.is_long_term && <Tag color="purple">长线伏笔</Tag>}
+                  {currentForeshadow.is_long_term && <Tag color="purple">{t('长线伏笔')}</Tag>}
                   {currentForeshadow.category && CATEGORY_CONFIG[currentForeshadow.category] && (
                     <Tag color={CATEGORY_CONFIG[currentForeshadow.category].color}>
                       {CATEGORY_CONFIG[currentForeshadow.category].label}
@@ -876,13 +877,13 @@ export default function Foreshadows() {
               </Col>
               
               <Col span={24}>
-                <strong>伏笔内容：</strong>
+                <strong>{t('伏笔内容：')}</strong>
                 <p style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{currentForeshadow.content}</p>
               </Col>
               
               {currentForeshadow.hint_text && (
                 <Col span={24}>
-                  <strong>暗示文本：</strong>
+                  <strong>{t('暗示文本：')}</strong>
                   <p style={{ marginTop: 8, whiteSpace: 'pre-wrap', color: token.colorTextSecondary }}>
                     {currentForeshadow.hint_text}
                   </p>
@@ -891,7 +892,7 @@ export default function Foreshadows() {
               
               {currentForeshadow.resolution_text && (
                 <Col span={24}>
-                  <strong>揭示文本：</strong>
+                  <strong>{t('揭示文本：')}</strong>
                   <p style={{ marginTop: 8, whiteSpace: 'pre-wrap', color: token.colorTextSecondary }}>
                     {currentForeshadow.resolution_text}
                   </p>
@@ -899,31 +900,31 @@ export default function Foreshadows() {
               )}
               
               <Col span={12}>
-                <strong>埋入章节：</strong> {currentForeshadow.plant_chapter_number ? `第${currentForeshadow.plant_chapter_number}章` : '未设定'}
+                <strong>{t('埋入章节：')}</strong> {currentForeshadow.plant_chapter_number ? t('第{{plant_chapter_number}}章', { plant_chapter_number: currentForeshadow.plant_chapter_number }) : t('未设定')}
               </Col>
               <Col span={12}>
-                <strong>计划回收：</strong> {currentForeshadow.target_resolve_chapter_number ? `第${currentForeshadow.target_resolve_chapter_number}章` : '未设定'}
+                <strong>{t('计划回收：')}</strong> {currentForeshadow.target_resolve_chapter_number ? t('第{{target_resolve_chapter_number}}章', { target_resolve_chapter_number: currentForeshadow.target_resolve_chapter_number }) : t('未设定')}
               </Col>
               
               {currentForeshadow.actual_resolve_chapter_number && (
                 <Col span={24}>
-                  <strong>实际回收：</strong> 第{currentForeshadow.actual_resolve_chapter_number}章
+                  <strong>{t('实际回收：')}</strong> {t('第{{actual_resolve_chapter_number}}章', { actual_resolve_chapter_number: currentForeshadow.actual_resolve_chapter_number })}
                 </Col>
               )}
               
               <Col span={8}>
-                <strong>重要性：</strong> {'★'.repeat(Math.round(currentForeshadow.importance * 5))}
+                <strong>{t('重要性：')}</strong> {'★'.repeat(Math.round(currentForeshadow.importance * 5))}
               </Col>
               <Col span={8}>
-                <strong>强度：</strong> {currentForeshadow.strength}/10
+                <strong>{t('强度：')}</strong> {currentForeshadow.strength}/10
               </Col>
               <Col span={8}>
-                <strong>隐藏度：</strong> {currentForeshadow.subtlety}/10
+                <strong>{t('隐藏度：')}</strong> {currentForeshadow.subtlety}/10
               </Col>
               
               {currentForeshadow.related_characters && currentForeshadow.related_characters.length > 0 && (
                 <Col span={24}>
-                  <strong>关联角色：</strong>
+                  <strong>{t('关联角色：')}</strong>
                   <div style={{ marginTop: 4 }}>
                     {currentForeshadow.related_characters.map((name, idx) => (
                       <Tag key={idx}>{name}</Tag>
@@ -934,13 +935,13 @@ export default function Foreshadows() {
               
               {currentForeshadow.notes && (
                 <Col span={24}>
-                  <strong>备注：</strong>
+                  <strong>{t('备注：')}</strong>
                   <p style={{ marginTop: 8, color: token.colorTextSecondary }}>{currentForeshadow.notes}</p>
                 </Col>
               )}
               
               <Col span={24}>
-                <strong>来源：</strong> {currentForeshadow.source_type === 'analysis' ? '章节分析提取' : '手动添加'}
+                <strong>{t('来源：')}</strong> {currentForeshadow.source_type === 'analysis' ? t('章节分析提取') : t('手动添加')}
               </Col>
             </Row>
           </div>
@@ -949,7 +950,7 @@ export default function Foreshadows() {
 
       {/* 标记埋入模态框 */}
       <Modal
-        title="标记伏笔埋入"
+        title={t('标记伏笔埋入')}
         open={plantModalVisible}
         centered
         onCancel={() => {
@@ -961,24 +962,24 @@ export default function Foreshadows() {
         destroyOnClose
       >
         <Form form={plantForm} layout="vertical" onFinish={handlePlant}>
-          <Form.Item name="chapter_id" label="选择埋入章节" rules={[{ required: true, message: '请选择章节' }]}>
-            <Select placeholder="选择章节">
+          <Form.Item name="chapter_id" label={t('选择埋入章节')} rules={[{ required: true, message: t('请选择章节') }]}>
+            <Select placeholder={t('选择章节')}>
               {chapters.map(chapter => (
                 <Option key={chapter.id} value={chapter.id}>
-                  第{chapter.chapter_number}章 - {chapter.title}
+                  {t('第{{chapter_number}}章 - {{title}}', { chapter_number: chapter.chapter_number, title: chapter.title })}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="hint_text" label="暗示文本（可选）">
-            <TextArea rows={3} placeholder="记录埋伏笔时使用的暗示性描写" />
+          <Form.Item name="hint_text" label={t('暗示文本（可选）')}>
+            <TextArea rows={3} placeholder={t('记录埋伏笔时使用的暗示性描写')} />
           </Form.Item>
         </Form>
       </Modal>
 
       {/* 标记回收模态框 */}
       <Modal
-        title="标记伏笔回收"
+        title={t('标记伏笔回收')}
         open={resolveModalVisible}
         centered
         onCancel={() => {
@@ -990,46 +991,46 @@ export default function Foreshadows() {
         destroyOnClose
       >
         <Form form={resolveForm} layout="vertical" onFinish={handleResolve}>
-          <Form.Item name="chapter_id" label="选择回收章节" rules={[{ required: true, message: '请选择章节' }]}>
-            <Select placeholder="选择章节">
+          <Form.Item name="chapter_id" label={t('选择回收章节')} rules={[{ required: true, message: t('请选择章节') }]}>
+            <Select placeholder={t('选择章节')}>
               {chapters.map(chapter => (
                 <Option key={chapter.id} value={chapter.id}>
-                  第{chapter.chapter_number}章 - {chapter.title}
+                  {t('第{{chapter_number}}章 - {{title}}', { chapter_number: chapter.chapter_number, title: chapter.title })}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="resolution_text" label="揭示文本（可选）">
-            <TextArea rows={3} placeholder="记录回收伏笔时的揭示内容" />
+          <Form.Item name="resolution_text" label={t('揭示文本（可选）')}>
+            <TextArea rows={3} placeholder={t('记录回收伏笔时的揭示内容')} />
           </Form.Item>
-          <Form.Item name="is_partial" label="是否部分回收" valuePropName="checked">
-            <Switch checkedChildren="部分" unCheckedChildren="完全" />
+          <Form.Item name="is_partial" label={t('是否部分回收')} valuePropName="checked">
+            <Switch checkedChildren={t('部分')} unCheckedChildren={t('完全')} />
           </Form.Item>
         </Form>
       </Modal>
 
       {/* 同步模态框 */}
       <Modal
-        title="手动同步分析伏笔"
+        title={t('手动同步分析伏笔')}
         open={syncModalVisible}
         centered
         onCancel={() => setSyncModalVisible(false)}
         onOk={handleSync}
         confirmLoading={syncing}
-        okText="开始同步"
+        okText={t('开始同步')}
       >
         <Alert
-          message="提示"
-          description="通常情况下，章节分析完成后伏笔会自动同步到伏笔管理中。此功能用于手动补充同步可能遗漏的伏笔。"
+          message={t('提示')}
+          description={t('通常情况下，章节分析完成后伏笔会自动同步到伏笔管理中。此功能用于手动补充同步可能遗漏的伏笔。')}
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
         />
-        <p>此操作将从已完成的章节分析结果中提取伏笔信息，同步到伏笔管理表。</p>
+        <p>{t('此操作将从已完成的章节分析结果中提取伏笔信息，同步到伏笔管理表。')}</p>
         <ul>
-          <li>已存在的伏笔记录不会被覆盖</li>
-          <li>新同步的伏笔将自动设置为"已埋入"状态</li>
-          <li>同步完成后可在列表中查看和编辑</li>
+          <li>{t('已存在的伏笔记录不会被覆盖')}</li>
+          <li>{t('新同步的伏笔将自动设置为"已埋入"状态')}</li>
+          <li>{t('同步完成后可在列表中查看和编辑')}</li>
         </ul>
       </Modal>
     </div>

@@ -5,6 +5,7 @@
 - 如果有启用的MCP插件且有可用工具，自动发送tools
 - 通过 auto_mcp 参数控制是否启用自动工具加载
 """
+import json
 from typing import Optional, AsyncGenerator, List, Dict, Any, Union
 
 from app.config import settings as app_settings
@@ -25,6 +26,56 @@ from app.services.json_helper import clean_json_response, parse_json
 cleanup_http_clients = cleanup_all_clients
 
 logger = get_logger(__name__)
+
+
+# ========== AI 生成内容语言 ==========
+# 默认 zh：保持原有中文提示词行为不变；vi：在系统提示词末尾追加输出语言要求
+SUPPORTED_CONTENT_LANGUAGES = ("zh", "vi")
+DEFAULT_CONTENT_LANGUAGE = "zh"
+
+CONTENT_LANGUAGE_INSTRUCTIONS: Dict[str, str] = {
+    "vi": (
+        "【Output language / Ngôn ngữ đầu ra】\n"
+        "Hãy viết toàn bộ nội dung đầu ra bằng tiếng Việt (văn phong tự nhiên, trôi chảy), "
+        "bất kể các chỉ dẫn ở trên được viết bằng ngôn ngữ nào. "
+        "Nếu yêu cầu đầu ra dạng JSON, hãy giữ nguyên tên khóa JSON (key) và các giá trị enum/mã đã được quy định, "
+        "chỉ viết các giá trị văn bản bằng tiếng Việt.\n"
+        "Write ALL output content in Vietnamese, regardless of the language of the instructions above. "
+        "If JSON output is required, keep JSON keys and any specified enum/code values exactly as specified; "
+        "only the natural-language text values must be in Vietnamese."
+    ),
+}
+
+
+def normalize_content_language(value: Optional[str]) -> str:
+    """规范化内容语言代码，未知值回退为 zh。"""
+    lang = (value or "").strip().lower()
+    if lang.startswith("vi"):
+        return "vi"
+    return DEFAULT_CONTENT_LANGUAGE
+
+
+def get_content_language_from_preferences(raw_preferences: Optional[str]) -> str:
+    """从 Settings.preferences(JSON) 中读取 content_language。"""
+    try:
+        prefs = json.loads(raw_preferences or "{}")
+    except (json.JSONDecodeError, TypeError):
+        return DEFAULT_CONTENT_LANGUAGE
+    if not isinstance(prefs, dict):
+        return DEFAULT_CONTENT_LANGUAGE
+    return normalize_content_language(prefs.get("content_language"))
+
+
+def apply_content_language(system_prompt: Optional[str], content_language: Optional[str]) -> Optional[str]:
+    """按内容语言在系统提示词末尾追加输出语言要求（zh 时原样返回）。"""
+    instruction = CONTENT_LANGUAGE_INSTRUCTIONS.get(normalize_content_language(content_language))
+    if not instruction:
+        return system_prompt
+    if system_prompt and instruction in system_prompt:
+        return system_prompt
+    if system_prompt and system_prompt.strip():
+        return f"{system_prompt.rstrip()}\n\n{instruction}"
+    return instruction
 
 
 def normalize_provider(provider: Optional[str]) -> Optional[str]:
@@ -94,6 +145,7 @@ class AIService:
         db_session: Optional[Any] = None,
         enable_mcp: bool = True,
         disable_thinking: bool = False,
+        content_language: Optional[str] = None,
     ):
         self.raw_api_provider = (api_provider or app_settings.default_ai_provider or "openai").lower().strip()
         self.api_provider = normalize_provider(self.raw_api_provider)
@@ -101,6 +153,8 @@ class AIService:
         self.default_temperature = default_temperature or app_settings.default_temperature
         self.default_max_tokens = default_max_tokens or app_settings.default_max_tokens
         self.default_system_prompt = default_system_prompt
+        # AI 生成内容语言（zh/vi），vi 时会在系统提示词后追加语言要求
+        self.content_language = normalize_content_language(content_language)
         self.config = config or default_config
         
         # MCP配置
@@ -177,6 +231,10 @@ class AIService:
         self._tools_loaded = False
         logger.debug(f"🔧 MCP工具状态已重置: enable_mcp={self._enable_mcp}, _tools_loaded=False")
     
+    def _resolve_system_prompt(self, system_prompt: Optional[str]) -> Optional[str]:
+        """合并默认系统提示词，并按内容语言追加输出语言要求。"""
+        return apply_content_language(system_prompt or self.default_system_prompt, self.content_language)
+
     def _get_provider(self, provider: Optional[str] = None) -> BaseAIProvider:
         """获取对应的 Provider"""
         p = normalize_provider(provider or self.api_provider)
@@ -364,7 +422,7 @@ class AIService:
                     model=kwargs.get("model") or self.default_model,
                     temperature=kwargs.get("temperature") or self.default_temperature,
                     max_tokens=kwargs.get("max_tokens") or self.default_max_tokens,
-                    system_prompt=kwargs.get("system_prompt") or self.default_system_prompt,
+                    system_prompt=self._resolve_system_prompt(kwargs.get("system_prompt")),
                     tools=None if tool_choice == "none" else self._cached_tools,
                     tool_choice=tool_choice,
                 )
@@ -457,7 +515,7 @@ class AIService:
                 model=model or self.default_model,
                 temperature=temperature or self.default_temperature,
                 max_tokens=max_tokens or self.default_max_tokens,
-                system_prompt=system_prompt or self.default_system_prompt,
+                system_prompt=self._resolve_system_prompt(system_prompt),
                 tools=tools,
                 tool_choice=tool_choice,
             )
@@ -557,7 +615,7 @@ class AIService:
                 model=model or self.default_model,
                 temperature=temperature or self.default_temperature,
                 max_tokens=max_tokens or self.default_max_tokens,
-                system_prompt=system_prompt or self.default_system_prompt,
+                system_prompt=self._resolve_system_prompt(system_prompt),
                 tools=tools_to_use,
                 tool_choice=tool_choice,
                 user_id=self.user_id,
@@ -703,6 +761,7 @@ def create_user_ai_service(
     temperature: float,
     max_tokens: int,
     system_prompt: Optional[str] = None,
+    content_language: Optional[str] = None,
 ) -> AIService:
     """创建用户 AI 服务（不带MCP支持）"""
     return AIService(
@@ -713,6 +772,7 @@ def create_user_ai_service(
         default_temperature=temperature,
         default_max_tokens=max_tokens,
         default_system_prompt=system_prompt,
+        content_language=content_language,
     )
 
 
@@ -728,6 +788,7 @@ def create_user_ai_service_with_mcp(
     system_prompt: Optional[str] = None,
     enable_mcp: bool = True,
     disable_thinking: bool = False,
+    content_language: Optional[str] = None,
 ) -> AIService:
     """
     创建支持MCP的用户AI服务
@@ -743,6 +804,7 @@ def create_user_ai_service_with_mcp(
         db_session: 数据库会话
         system_prompt: 系统提示词
         enable_mcp: 是否启用MCP工具
+        content_language: AI 生成内容语言（zh/vi）
         
     Returns:
         配置好的AIService实例
@@ -759,4 +821,5 @@ def create_user_ai_service_with_mcp(
         db_session=db_session,
         enable_mcp=enable_mcp,
         disable_thinking=disable_thinking,
+        content_language=content_language,
     )

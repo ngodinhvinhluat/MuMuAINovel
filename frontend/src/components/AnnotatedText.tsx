@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { theme } from 'antd';
+import { t } from '../i18n';
 
 // 标注数据类型
 export interface MemoryAnnotation {
@@ -221,7 +222,7 @@ const AnnotatedText: React.FC<AnnotatedTextProps> = ({
 
     // 简化工具提示内容，不再使用复杂的React元素，改为纯文本或移除Tooltip
     const tooltipText = annotations && annotations.length > 1
-      ? `此处有 ${annotations.length} 个标注`
+      ? t('此处有 {{annotationsCount}} 个标注', { annotationsCount: annotations.length })
       : `${annotation.title}: ${annotation.content.slice(0, 100)}${annotation.content.length > 100 ? '...' : ''}`;
 
     return (

@@ -25,6 +25,7 @@ import {
 import { useStore } from '../store';
 import { writingStyleApi } from '../services/api';
 import type { WritingStyle, WritingStyleCreate, WritingStyleUpdate } from '../types';
+import { t } from '../i18n';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -79,7 +80,7 @@ export default function WritingStyles() {
       
       setStyles(sortedStyles);
     } catch {
-      message.error('加载风格列表失败');
+      message.error(t('加载风格列表失败'));
     } finally {
       setLoading(false);
     }
@@ -95,12 +96,12 @@ export default function WritingStyles() {
       };
 
       await writingStyleApi.createStyle(createData);
-      message.success('创建成功');
+      message.success(t('创建成功'));
       setIsCreateModalOpen(false);
       createForm.resetFields();
       await loadStyles();
     } catch {
-      message.error('创建失败');
+      message.error(t('创建失败'));
     }
   };
 
@@ -119,38 +120,38 @@ export default function WritingStyles() {
 
     try {
       await writingStyleApi.updateStyle(editingStyle.id, values);
-      message.success('更新成功');
+      message.success(t('更新成功'));
       setIsEditModalOpen(false);
       editForm.resetFields();
       setEditingStyle(null);
       await loadStyles();
     } catch {
-      message.error('更新失败');
+      message.error(t('更新失败'));
     }
   };
 
   const handleDelete = async (styleId: number) => {
     try {
       await writingStyleApi.deleteStyle(styleId);
-      message.success('删除成功');
+      message.success(t('删除成功'));
       await loadStyles();
     } catch {
-      message.error('删除失败');
+      message.error(t('删除失败'));
     }
   };
 
   const handleSetDefault = async (styleId: number) => {
     if (!currentProject?.id) {
-      message.warning('请先选择项目');
+      message.warning(t('请先选择项目'));
       return;
     }
     
     try {
       await writingStyleApi.setDefaultStyle(styleId, currentProject.id);
-      message.success('设置默认风格成功');
+      message.success(t('设置默认风格成功'));
       await loadStyles();
     } catch {
-      message.error('设置失败');
+      message.error(t('设置失败'));
     }
   };
 
@@ -164,7 +165,7 @@ export default function WritingStyles() {
   };
 
   const getStyleTypeLabel = (styleType: string) => {
-    return styleType === 'preset' ? '预设' : '自定义';
+    return styleType === 'preset' ? t('预设') : t('自定义');
   };
 
   return (
@@ -183,20 +184,20 @@ export default function WritingStyles() {
       }}>
         <h2 style={{ margin: 0, fontSize: isMobile ? 18 : 24 }}>
           <EditOutlined style={{ marginRight: 8 }} />
-          写作风格管理
+          {t('写作风格管理')}
         </h2>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={showCreateModal}
         >
-          创建自定义风格
+          {t('创建自定义风格')}
         </Button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {styles.length === 0 ? (
-          <Empty description="暂无风格数据" />
+          <Empty description={t('暂无风格数据')} />
         ) : (
           <Row
             gutter={[0, gridConfig.gutter]}
@@ -254,11 +255,11 @@ export default function WritingStyles() {
                     />,
                     <Popconfirm
                       key="delete"
-                      title="确定删除这个风格吗？"
-                      description={style.is_default ? '这是默认风格，删除后需要设置新的默认风格' : undefined}
+                      title={t('确定删除这个风格吗？')}
+                      description={style.is_default ? t('这是默认风格，删除后需要设置新的默认风格') : undefined}
                       onConfirm={() => handleDelete(style.id)}
-                      okText="确定"
-                      cancelText="取消"
+                      okText={t('确定')}
+                      cancelText={t('取消')}
                       disabled={style.user_id === null}
                     >
                       <DeleteOutlined
@@ -277,7 +278,7 @@ export default function WritingStyles() {
                       <Tag color={getStyleTypeColor(style.style_type)}>
                         {getStyleTypeLabel(style.style_type)}
                       </Tag>
-                      {style.is_default && <Tag color="gold">默认</Tag>}
+                      {style.is_default && <Tag color="gold">{t('默认')}</Tag>}
                     </Space>
                     
                     {style.description && (
@@ -315,7 +316,7 @@ export default function WritingStyles() {
 
       {/* 创建自定义风格 Modal */}
       <Modal
-        title="创建自定义风格"
+        title={t('创建自定义风格')}
         open={isCreateModalOpen}
         onCancel={() => {
           setIsCreateModalOpen(false);
@@ -333,25 +334,25 @@ export default function WritingStyles() {
           style={{ marginTop: 16 }}
         >
           <Form.Item
-            label="风格名称"
+            label={t('风格名称')}
             name="name"
-            rules={[{ required: true, message: '请输入风格名称' }]}
+            rules={[{ required: true, message: t('请输入风格名称') }]}
           >
-            <Input placeholder="如：武侠风、科幻风" />
+            <Input placeholder={t('如：武侠风、科幻风')} />
           </Form.Item>
           
-          <Form.Item label="风格描述" name="description">
-            <TextArea rows={2} placeholder="简要描述这个风格的特点..." />
+          <Form.Item label={t('风格描述')} name="description">
+            <TextArea rows={2} placeholder={t('简要描述这个风格的特点...')} />
           </Form.Item>
           
           <Form.Item
-            label="提示词内容"
+            label={t('提示词内容')}
             name="prompt_content"
-            rules={[{ required: true, message: '请输入提示词内容' }]}
+            rules={[{ required: true, message: t('请输入提示词内容') }]}
           >
             <TextArea
               rows={6}
-              placeholder="输入风格的提示词，用于引导AI生成符合该风格的内容..."
+              placeholder={t('输入风格的提示词，用于引导AI生成符合该风格的内容...')}
             />
           </Form.Item>
           
@@ -361,10 +362,10 @@ export default function WritingStyles() {
                 setIsCreateModalOpen(false);
                 createForm.resetFields();
               }}>
-                取消
+                {t('取消')}
               </Button>
               <Button type="primary" htmlType="submit" loading={loading}>
-                创建
+                {t('创建')}
               </Button>
             </Space>
           </Form.Item>
@@ -373,7 +374,7 @@ export default function WritingStyles() {
 
       {/* 编辑风格 Modal */}
       <Modal
-        title="编辑写作风格"
+        title={t('编辑写作风格')}
         open={isEditModalOpen}
         onCancel={() => {
           setIsEditModalOpen(false);
@@ -387,25 +388,25 @@ export default function WritingStyles() {
       >
         <Form form={editForm} layout="vertical" onFinish={handleUpdate} style={{ marginTop: 16 }}>
           <Form.Item
-            label="风格名称"
+            label={t('风格名称')}
             name="name"
-            rules={[{ required: true, message: '请输入风格名称' }]}
+            rules={[{ required: true, message: t('请输入风格名称') }]}
           >
-            <Input placeholder="输入风格名称" />
+            <Input placeholder={t('输入风格名称')} />
           </Form.Item>
           
-          <Form.Item label="风格描述" name="description">
-            <TextArea rows={2} placeholder="简要描述这个风格的特点..." />
+          <Form.Item label={t('风格描述')} name="description">
+            <TextArea rows={2} placeholder={t('简要描述这个风格的特点...')} />
           </Form.Item>
           
           <Form.Item
-            label="提示词内容"
+            label={t('提示词内容')}
             name="prompt_content"
-            rules={[{ required: true, message: '请输入提示词内容' }]}
+            rules={[{ required: true, message: t('请输入提示词内容') }]}
           >
             <TextArea 
               rows={6} 
-              placeholder="输入风格的提示词..."
+              placeholder={t('输入风格的提示词...')}
             />
           </Form.Item>
           
@@ -416,10 +417,10 @@ export default function WritingStyles() {
                 editForm.resetFields();
                 setEditingStyle(null);
               }}>
-                取消
+                {t('取消')}
               </Button>
               <Button type="primary" htmlType="submit" loading={loading}>
-                保存
+                {t('保存')}
               </Button>
             </Space>
           </Form.Item>

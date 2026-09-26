@@ -13,6 +13,7 @@ import {
 import api from '../services/api';
 import AnnotatedText, { type MemoryAnnotation } from '../components/AnnotatedText';
 import MemorySidebar from '../components/MemorySidebar';
+import { t } from '../i18n';
 
 interface ChapterData {
   id: string;
@@ -115,7 +116,7 @@ const ChapterReader: React.FC = () => {
 
       // 验证数据
       if (!chapterData || !chapterData.content) {
-        throw new Error('章节数据无效：缺少内容');
+        throw new Error(t('章节数据无效：缺少内容'));
       }
 
       setChapter(chapterData);
@@ -139,7 +140,7 @@ const ChapterReader: React.FC = () => {
     } catch (err: unknown) {
       console.error('加载章节数据失败:', err);
       const error = err as { response?: { data?: { detail?: string } }; message?: string };
-      setError(error.response?.data?.detail || error.message || '加载失败');
+      setError(error.response?.data?.detail || error.message || t('加载失败'));
     } finally {
       setLoading(false);
     }
@@ -201,7 +202,7 @@ const ChapterReader: React.FC = () => {
     try {
       setAnalyzing(true);
       setAnalysisProgress(0);
-      message.loading({ content: '开始分析章节...', key: 'analyze', duration: 0 });
+      message.loading({ content: t('开始分析章节...'), key: 'analyze', duration: 0 });
 
       // 触发分析
       await api.post(`/chapters/${requestedChapterId}/analyze`);
@@ -211,7 +212,7 @@ const ChapterReader: React.FC = () => {
 
         if (Date.now() >= deadline) {
           setAnalyzing(false);
-          message.warning({ content: '分析超时，请稍后刷新查看结果', key: 'analyze' });
+          message.warning({ content: t('分析超时，请稍后刷新查看结果'), key: 'analyze' });
           return;
         }
 
@@ -227,7 +228,7 @@ const ChapterReader: React.FC = () => {
 
           if (status === 'completed') {
             setAnalyzing(false);
-            message.success({ content: '分析完成！', key: 'analyze' });
+            message.success({ content: t('分析完成！'), key: 'analyze' });
             const annotationsRes = await api.get<unknown, AnnotationsData>(
               `/chapters/${requestedChapterId}/annotations`
             );
@@ -238,7 +239,7 @@ const ChapterReader: React.FC = () => {
           } else if (status === 'failed') {
             setAnalyzing(false);
             message.error({
-              content: `分析失败：${error_message || '未知错误'}`,
+              content: t('分析失败：{{v1}}', { v1: error_message || t('未知错误') }),
               key: 'analyze'
             });
             return;
@@ -261,7 +262,7 @@ const ChapterReader: React.FC = () => {
       }
       const error = err as { response?: { data?: { detail?: string } } };
       message.error({
-        content: error.response?.data?.detail || '触发分析失败',
+        content: error.response?.data?.detail || t('触发分析失败'),
         key: 'analyze'
       });
     }
@@ -270,7 +271,7 @@ const ChapterReader: React.FC = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '100px 0' }}>
-        <Spin size="large" tip="加载章节中..." />
+        <Spin size="large" tip={t('加载章节中...')} />
       </div>
     );
   }
@@ -279,13 +280,13 @@ const ChapterReader: React.FC = () => {
     return (
       <div style={{ padding: 24 }}>
         <Alert
-          message="加载失败"
-          description={error || '章节不存在'}
+          message={t('加载失败')}
+          description={error || t('章节不存在')}
           type="error"
           showIcon
         />
         <Button onClick={handleBackClick} style={{ marginTop: 16 }}>
-          返回
+          {t('返回')}
         </Button>
       </div>
     );
@@ -308,26 +309,26 @@ const ChapterReader: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={handleBackClick}>
-              返回
+              {t('返回')}
             </Button>
             <Button
               icon={<LeftOutlined />}
               onClick={handlePreviousChapter}
               disabled={!navigation?.previous}
-              title={navigation?.previous ? `上一章: ${navigation.previous.title}` : '已是第一章'}
+              title={navigation?.previous ? t('上一章: {{title}}', { title: navigation.previous.title }) : t('已是第一章')}
             >
-              上一章
+              {t('上一章')}
             </Button>
             <span style={{ fontSize: 16, fontWeight: 600 }}>
-              第{chapter.chapter_number}章: {chapter.title}
+              {t('第{{chapter_number}}章: {{title}}', { chapter_number: chapter.chapter_number, title: chapter.title })}
             </span>
             <Button
               icon={<RightOutlined />}
               onClick={handleNextChapter}
               disabled={!navigation?.next}
-              title={navigation?.next ? `下一章: ${navigation.next.title}` : '已是最后一章'}
+              title={navigation?.next ? t('下一章: {{title}}', { title: navigation.next.title }) : t('已是最后一章')}
             >
-              下一章
+              {t('下一章')}
             </Button>
           </Space>
 
@@ -338,7 +339,7 @@ const ChapterReader: React.FC = () => {
               loading={analyzing}
               disabled={analyzing}
             >
-              {analyzing ? '分析中...' : '重新分析'}
+              {analyzing ? t('分析中...') : t('重新分析')}
             </Button>
             {hasAnnotations && (
               <>
@@ -348,13 +349,13 @@ const ChapterReader: React.FC = () => {
                   checkedChildren={<EyeOutlined />}
                   unCheckedChildren={<EyeInvisibleOutlined />}
                 />
-                <span style={{ fontSize: 13, color: token.colorTextSecondary }}>显示标注</span>
+                <span style={{ fontSize: 13, color: token.colorTextSecondary }}>{t('显示标注')}</span>
                 <Button
                   icon={<MenuOutlined />}
                   onClick={() => setSidebarVisible(true)}
                   style={{ display: window.innerWidth < 768 ? 'inline-block' : 'none' }}
                 >
-                  分析
+                  {t('分析')}
                 </Button>
               </>
             )}
@@ -365,21 +366,21 @@ const ChapterReader: React.FC = () => {
           <div style={{ marginTop: 12 }}>
             <Progress percent={analysisProgress} size="small" status="active" />
             <span style={{ fontSize: 12, color: token.colorTextSecondary, marginLeft: 8 }}>
-              正在分析章节...
+              {t('正在分析章节...')}
             </span>
           </div>
         )}
 
         {!analyzing && hasAnnotations && annotationsData && (
           <div style={{ marginTop: 12, fontSize: 12, color: token.colorTextTertiary }}>
-            共有 {annotationsData.summary.total_annotations} 个标注：
-            {annotationsData.summary.hooks > 0 && ` 🎣${annotationsData.summary.hooks}个钩子`}
+            {t('共有 {{total_annotations}} 个标注：', { total_annotations: annotationsData.summary.total_annotations })}
+            {annotationsData.summary.hooks > 0 && t(' 🎣{{hooks}}个钩子', { hooks: annotationsData.summary.hooks })}
             {annotationsData.summary.foreshadows > 0 &&
-              ` 🌟${annotationsData.summary.foreshadows}个伏笔`}
+              t(' 🌟{{foreshadows}}个伏笔', { foreshadows: annotationsData.summary.foreshadows })}
             {annotationsData.summary.plot_points > 0 &&
-              ` 💎${annotationsData.summary.plot_points}个情节点`}
+              t(' 💎{{plot_points}}个情节点', { plot_points: annotationsData.summary.plot_points })}
             {annotationsData.summary.character_events > 0 &&
-              ` 👤${annotationsData.summary.character_events}个角色事件`}
+              t(' 👤{{character_events}}个角色事件', { character_events: annotationsData.summary.character_events })}
           </div>
         )}
       </Card>
@@ -399,8 +400,8 @@ const ChapterReader: React.FC = () => {
             <div style={{ maxWidth: 800, margin: '0 auto' }}>
               {!hasAnnotations && (
                 <Alert
-                  message="暂无分析数据"
-                  description="该章节尚未进行AI分析，无法显示记忆标注。"
+                  message={t('暂无分析数据')}
+                  description={t('该章节尚未进行AI分析，无法显示记忆标注。')}
                   type="info"
                   showIcon
                   style={{ marginBottom: 24 }}
@@ -437,8 +438,8 @@ const ChapterReader: React.FC = () => {
                     disabled={!navigation?.previous}
                   >
                     {navigation?.previous
-                      ? `上一章: 第${navigation.previous.chapter_number}章 ${navigation.previous.title}`
-                      : '已是第一章'}
+                      ? t('上一章: 第{{chapter_number}}章 {{title}}', { chapter_number: navigation.previous.chapter_number, title: navigation.previous.title })
+                      : t('已是第一章')}
                   </Button>
                   <Button
                     size="large"
@@ -449,8 +450,8 @@ const ChapterReader: React.FC = () => {
                     iconPosition="end"
                   >
                     {navigation?.next
-                      ? `下一章: 第${navigation.next.chapter_number}章 ${navigation.next.title}`
-                      : '已是最后一章'}
+                      ? t('下一章: 第{{chapter_number}}章 {{title}}', { chapter_number: navigation.next.chapter_number, title: navigation.next.title })
+                      : t('已是最后一章')}
                   </Button>
                 </Space>
               </div>
@@ -480,7 +481,7 @@ const ChapterReader: React.FC = () => {
       {/* 移动端抽屉 */}
       {hasAnnotations && annotationsData && (
         <Drawer
-          title="章节分析"
+          title={t('章节分析')}
           placement="right"
           onClose={() => setSidebarVisible(false)}
           open={sidebarVisible}
