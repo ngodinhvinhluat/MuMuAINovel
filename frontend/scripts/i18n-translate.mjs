@@ -4,6 +4,7 @@
  *
  *   node scripts/i18n-translate.mjs            # dịch các khóa còn thiếu trong vi.json
  *   node scripts/i18n-translate.mjs --check    # chỉ liệt kê số khóa thiếu
+ *   node scripts/i18n-translate.mjs --prune    # xóa khóa không còn dùng trong code
  *
  * Tùy chọn qua biến môi trường: I18N_MODEL (mặc định sonnet), I18N_BATCH (100), I18N_CONCURRENCY (6),
  * CLAUDE_BIN (mặc định claude). Yêu cầu `claude` đã đăng nhập.
@@ -34,18 +35,35 @@ Rules:
 - Keep leading/trailing spaces, punctuation style and line breaks. Translate Chinese punctuation to Vietnamese/Latin punctuation (，→, 。→. ：→: ！→! ？→? （）→()).
 - It is UI text: buttons short, messages clear. Use consistent terminology: ${GLOSSARY}`;
 
+// Khóa chỉ được tra qua biến (t(variable)), regex không tìm thấy.
+const EXTRA_KEYS = ['让AI重新生成', '组织成员', '主职业', '副职业', '职业分类', 'Skill·长篇', 'Skill·短篇',
+  'Skill·润色', 'Skill·工具', '男', '女', '其他', '第一人称', '第三人称', '全知视角'];
+
 function unescapeJs(raw, quote) {
   if (quote === '`') return raw;
+  let json = '';
+  for (let i = 0; i < raw.length; i += 1) {
+    const ch = raw[i];
+    if (ch === '\\') {
+      const next = raw[i + 1];
+      i += 1;
+      json += next === "'" ? "'" : next === '`' ? '`' : '\\' + next;
+    } else if (ch === '"') {
+      json += '\\"';
+    } else {
+      json += ch;
+    }
+  }
   try {
-    return JSON.parse('"' + raw.replace(/\\'/g, "'").replace(/(^|[^\\])"/g, '$1\\"') + '"');
+    return JSON.parse(`"${json}"`);
   } catch {
     return raw;
   }
 }
 
 function collectKeys() {
-  const keys = new Set();
-  const re = /(?<![\w$.])(?:i18n\.)?t\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
+  const keys = new Set(EXTRA_KEYS);
+  const re = /(?<![\w$.])(?:i18n\.)?(?:t|tr)\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
   const walk = (dir) => {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, ent.name);
@@ -123,7 +141,14 @@ async function main() {
   const vi = fs.existsSync(VI_PATH) ? JSON.parse(fs.readFileSync(VI_PATH, 'utf8') || '{}') : {};
   const keys = collectKeys();
   const missing = keys.filter((k) => !vi[k]);
-  console.log(`keys=${keys.length} translated=${keys.length - missing.length} missing=${missing.length}`);
+  const keySet = new Set(keys);
+  const stale = Object.keys(vi).filter((k) => !keySet.has(k));
+  console.log(`keys=${keys.length} translated=${keys.length - missing.length} missing=${missing.length} stale=${stale.length}`);
+  if (process.argv.includes('--prune') && stale.length) {
+    stale.forEach((k) => delete vi[k]);
+    fs.writeFileSync(VI_PATH, JSON.stringify(vi, null, 2) + '\n', 'utf8');
+    console.log(`pruned ${stale.length} stale keys`);
+  }
   if (process.argv.includes('--check') || !missing.length) return;
 
   const batches = [];
