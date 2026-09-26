@@ -28,3 +28,16 @@ Có thể dùng gói Claude Pro/Max hoặc ChatGPT Plus/Pro thông qua CLI thay 
 4. Trong cài đặt AI của MuMu: nhà cung cấp **OpenAI**, URL `http://host.docker.internal:8787/v1`, API key là `apiKey` ở bước 2, model `claude-sonnet` / `claude-opus` / `claude-haiku` / `codex`.
 
 Chi tiết và giới hạn: `tools/cli-bridge/README.md`.
+
+## Giao diện tiếng Việt và AI viết bằng tiếng Việt
+
+Bản trong repository này đã thêm tiếng Việt (image của tác giả thì chưa có), nên cần tự build image một lần:
+
+```bat
+docker compose -f compose.local.yaml build
+Start-MuMu.bat
+```
+
+- Chuyển ngôn ngữ giao diện bằng nút 中文 / Tiếng Việt ở trang đăng nhập, danh sách dự án hoặc menu người dùng.
+- Để AI viết truyện bằng tiếng Việt: vào Cài đặt, mục ngôn ngữ nội dung, chọn **Tiếng Việt**.
+- Khi code có thêm chuỗi tiếng Trung mới (bọc bằng `t('...')`), dịch tự động bằng Claude CLI: `cd frontend && node scripts/i18n-translate.mjs`.
