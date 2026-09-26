@@ -4,6 +4,7 @@ import { Card, Table, Tag, Button, Space, message, Modal, Form, Select, Slider, 
 import { PlusOutlined, ApartmentOutlined, UserOutlined, EditOutlined } from '@ant-design/icons';
 import { useStore } from '../store';
 import axios from 'axios';
+import { t as tr } from '../i18n';
 
 const { TextArea } = Input;
 
@@ -79,7 +80,7 @@ export default function Relationships() {
       setRelationshipTypes(typesRes.data);
       setCharacters(charsRes.data.items || []);
     } catch (error) {
-      message.error('加载数据失败');
+      message.error(tr('加载数据失败'));
       console.error(error);
     } finally {
       setLoading(false);
@@ -99,12 +100,12 @@ export default function Relationships() {
         project_id: projectId,
         ...values
       });
-      message.success('关系创建成功');
+      message.success(tr('关系创建成功'));
       setIsModalOpen(false);
       form.resetFields();
       loadData();
     } catch (error) {
-      message.error('创建关系失败');
+      message.error(tr('创建关系失败'));
       console.error(error);
     }
   };
@@ -140,33 +141,33 @@ export default function Relationships() {
         status: values.status,
         description: values.description,
       });
-      message.success('关系更新成功');
+      message.success(tr('关系更新成功'));
       setIsModalOpen(false);
       setIsEditMode(false);
       setEditingRelationship(null);
       form.resetFields();
       loadData();
     } catch (error) {
-      message.error('更新关系失败');
+      message.error(tr('更新关系失败'));
       console.error(error);
     }
   };
 
   const handleDeleteRelationship = async (id: string) => {
     modal.confirm({
-      title: '确认删除',
-      content: '确定要删除这条关系吗？',
+      title: tr('确认删除'),
+      content: tr('确定要删除这条关系吗？'),
       centered: true,
-      okText: '删除',
+      okText: tr('删除'),
       okType: 'danger',
-      cancelText: '取消',
+      cancelText: tr('取消'),
       onOk: async () => {
         try {
           await axios.delete(`/api/relationships/${id}`);
-          message.success('关系删除成功');
+          message.success(tr('关系删除成功'));
           loadData();
         } catch (error) {
-          message.error('删除失败');
+          message.error(tr('删除失败'));
           console.error(error);
         }
       }
@@ -175,7 +176,7 @@ export default function Relationships() {
 
   const getCharacterName = (id: string) => {
     const char = characters.find(c => c.id === id);
-    return char?.name || '未知';
+    return char?.name || tr('未知');
   };
 
   const getIntimacyColor = (level: number) => {
@@ -208,7 +209,7 @@ export default function Relationships() {
 
   const columns = [
     {
-      title: '角色A',
+      title: tr('角色A'),
       dataIndex: 'character_from_id',
       key: 'from',
       render: (id: string) => (
@@ -219,14 +220,14 @@ export default function Relationships() {
       width: 120,
     },
     {
-      title: '关系',
+      title: tr('关系'),
       dataIndex: 'relationship_name',
       key: 'relationship',
       render: (name: string) => <strong>{name}</strong>,
       width: 120,
     },
     {
-      title: '角色B',
+      title: tr('角色B'),
       dataIndex: 'character_to_id',
       key: 'to',
       render: (id: string) => (
@@ -237,7 +238,7 @@ export default function Relationships() {
       width: 120,
     },
     {
-      title: '亲密度',
+      title: tr('亲密度'),
       dataIndex: 'intimacy_level',
       key: 'intimacy',
       render: (level: number) => (
@@ -246,7 +247,7 @@ export default function Relationships() {
       width: 80,
     },
     {
-      title: '状态',
+      title: tr('状态'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
@@ -255,16 +256,16 @@ export default function Relationships() {
       width: 80,
     },
     {
-      title: '来源',
+      title: tr('来源'),
       dataIndex: 'source',
       key: 'source',
       render: (source: string) => (
-        <Tag>{source === 'ai' ? 'AI生成' : '手动创建'}</Tag>
+        <Tag>{source === 'ai' ? tr('AI生成') : tr('手动创建')}</Tag>
       ),
       width: 100,
     },
     {
-      title: '操作',
+      title: tr('操作'),
       key: 'action',
       render: (_: unknown, record: Relationship) => (
         <Space size="small">
@@ -274,7 +275,7 @@ export default function Relationships() {
             icon={<EditOutlined />}
             onClick={() => handleEditRelationship(record)}
           >
-            编辑
+            {tr('编辑')}
           </Button>
           <Button
             type="link"
@@ -282,7 +283,7 @@ export default function Relationships() {
             size="small"
             onClick={() => handleDeleteRelationship(record.id)}
           >
-            删除
+            {tr('删除')}
           </Button>
         </Space>
       ),
@@ -301,10 +302,10 @@ export default function Relationships() {
   }, {} as Record<string, RelationshipType[]>);
 
   const categoryLabels: Record<string, string> = {
-    family: '家族关系',
-    social: '社交关系',
-    professional: '职业关系',
-    hostile: '敌对关系'
+    family: tr('家族关系'),
+    social: tr('社交关系'),
+    professional: tr('职业关系'),
+    hostile: tr('敌对关系')
   };
 
   return (
@@ -315,7 +316,7 @@ export default function Relationships() {
         title={
           <Space wrap>
             <ApartmentOutlined />
-            <span style={{ fontSize: isMobile ? 14 : 16 }}>关系管理</span>
+            <span style={{ fontSize: isMobile ? 14 : 16 }}>{tr('关系管理')}</span>
             {!isMobile && <Tag color="blue">{currentProject?.title}</Tag>}
           </Space>
         }
@@ -325,7 +326,7 @@ export default function Relationships() {
               onClick={() => projectId && navigate(`/project/${projectId}/relationships-graph`)}
               size={isMobile ? 'small' : 'middle'}
             >
-              关系图谱
+              {tr('关系图谱')}
             </Button>
             <Button
               type="primary"
@@ -333,7 +334,7 @@ export default function Relationships() {
               onClick={() => setIsModalOpen(true)}
               size={isMobile ? 'small' : 'middle'}
             >
-              {isMobile ? '添加' : '添加关系'}
+              {isMobile ? tr('添加') : tr('添加关系')}
             </Button>
           </Space>
         }
@@ -342,7 +343,7 @@ export default function Relationships() {
           items={[
             {
               key: 'list',
-              label: `关系列表 (${relationships.length})`,
+              label: tr('关系列表 ({{relationshipsCount}})', { relationshipsCount: relationships.length }),
               children: (
                 <Table
                   columns={columns}
@@ -356,7 +357,7 @@ export default function Relationships() {
                     position: ['bottomCenter'],
                     showSizeChanger: !isMobile,
                     showQuickJumper: !isMobile,
-                    showTotal: (total) => `共 ${total} 条`,
+                    showTotal: (total) => tr('共 {{total}} 条', { total }),
                     simple: isMobile,
                     onChange: (page, size) => {
                       setCurrentPage(page);
@@ -380,7 +381,7 @@ export default function Relationships() {
             },
             {
               key: 'types',
-              label: `关系类型 (${relationshipTypes.length})`,
+              label: tr('关系类型 ({{relationshipTypesCount}})', { relationshipTypesCount: relationshipTypes.length }),
               children: (
                 <div style={{
                   display: 'grid',
@@ -414,7 +415,7 @@ export default function Relationships() {
       </Card>
 
       <Modal
-        title={isEditMode ? '编辑关系' : '添加关系'}
+        title={isEditMode ? tr('编辑关系') : tr('添加关系')}
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
@@ -435,11 +436,11 @@ export default function Relationships() {
         >
           <Form.Item
             name="character_from_id"
-            label="角色A"
-            rules={[{ required: true, message: '请选择角色A' }]}
+            label={tr('角色A')}
+            rules={[{ required: true, message: tr('请选择角色A') }]}
           >
             <Select
-              placeholder="选择角色"
+              placeholder={tr('选择角色')}
               showSearch
               disabled={isEditMode}
               filterOption={(input, option) =>
@@ -453,11 +454,11 @@ export default function Relationships() {
 
           <Form.Item
             name="relationship_name"
-            label="关系类型"
-            rules={[{ required: true, message: '请选择或输入关系类型' }]}
+            label={tr('关系类型')}
+            rules={[{ required: true, message: tr('请选择或输入关系类型') }]}
           >
             <AutoComplete
-              placeholder="选择预定义类型或输入自定义关系"
+              placeholder={tr('选择预定义类型或输入自定义关系')}
               options={relationshipTypes.map(t => ({
                 label: `${t.icon || ''} ${t.name} (${categoryLabels[t.category]})`,
                 value: t.name
@@ -470,11 +471,11 @@ export default function Relationships() {
 
           <Form.Item
             name="character_to_id"
-            label="角色B"
-            rules={[{ required: true, message: '请选择角色B' }]}
+            label={tr('角色B')}
+            rules={[{ required: true, message: tr('请选择角色B') }]}
           >
             <Select
-              placeholder="选择角色"
+              placeholder={tr('选择角色')}
               showSearch
               disabled={isEditMode}
               filterOption={(input, option) =>
@@ -488,7 +489,7 @@ export default function Relationships() {
 
           <Form.Item
             name="intimacy_level"
-            label="亲密度"
+            label={tr('亲密度')}
             initialValue={50}
           >
             <Slider
@@ -506,19 +507,19 @@ export default function Relationships() {
 
           <Form.Item
             name="status"
-            label="状态"
+            label={tr('状态')}
             initialValue="active"
           >
             <Select>
-              <Select.Option value="active">活跃</Select.Option>
-              <Select.Option value="broken">破裂</Select.Option>
-              <Select.Option value="past">过去</Select.Option>
-              <Select.Option value="complicated">复杂</Select.Option>
+              <Select.Option value="active">{tr('活跃')}</Select.Option>
+              <Select.Option value="broken">{tr('破裂')}</Select.Option>
+              <Select.Option value="past">{tr('过去')}</Select.Option>
+              <Select.Option value="complicated">{tr('复杂')}</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item name="description" label="关系描述">
-            <TextArea rows={3} placeholder="描述这段关系的细节..." />
+          <Form.Item name="description" label={tr('关系描述')}>
+            <TextArea rows={3} placeholder={tr('描述这段关系的细节...')} />
           </Form.Item>
 
           <Form.Item>
@@ -528,9 +529,9 @@ export default function Relationships() {
                 setIsEditMode(false);
                 setEditingRelationship(null);
                 form.resetFields();
-              }}>取消</Button>
+              }}>{tr('取消')}</Button>
               <Button type="primary" htmlType="submit">
-                {isEditMode ? '更新' : '创建'}
+                {isEditMode ? tr('更新') : tr('创建')}
               </Button>
             </Space>
           </Form.Item>

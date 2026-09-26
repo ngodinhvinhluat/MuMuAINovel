@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Spin, Button, theme } from 'antd';
 import { LoadingOutlined, StopOutlined } from '@ant-design/icons';
+import { t } from '../i18n';
 
 interface SSEProgressModalProps {
   visible: boolean;
@@ -21,11 +22,11 @@ export const SSEProgressModal: React.FC<SSEProgressModalProps> = ({
   visible,
   progress,
   message,
-  title = 'AI生成中...',
+  title = t('AI生成中...'),
   showPercentage = true,
   showIcon = true,
   onCancel,
-  cancelButtonText = '取消任务',
+  cancelButtonText = t('取消任务'),
 }) => {
   const { token } = theme.useToken();
 
@@ -114,7 +115,7 @@ export const SSEProgressModal: React.FC<SSEProgressModalProps> = ({
           padding: '0 20px',
           marginBottom: 16
         }}>
-          {message || '准备生成...'}
+          {message || t('准备生成...')}
         </div>
 
         {/* 提示文字 */}
@@ -124,7 +125,7 @@ export const SSEProgressModal: React.FC<SSEProgressModalProps> = ({
           color: token.colorTextTertiary,
           marginBottom: onCancel ? 16 : 0
         }}>
-          请勿关闭页面，生成过程需要一定时间
+          {t('请勿关闭页面，生成过程需要一定时间')}
         </div>
 
         {/* 取消按钮 */}

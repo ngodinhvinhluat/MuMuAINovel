@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Spin, Result, Button, Modal, Input, message, theme } from 'antd';
 import { authApi } from '../services/api';
 import AnnouncementModal from '../components/AnnouncementModal';
+import { t } from '../i18n';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ export default function AuthCallback() {
       } catch (error) {
         console.error('登录失败:', error);
         setStatus('error');
-        setErrorMessage('登录失败，请重试');
+        setErrorMessage(t('登录失败，请重试'));
       }
     };
 
@@ -99,7 +100,7 @@ export default function AuthCallback() {
         <div style={{ textAlign: 'center' }}>
           <Spin size="large" />
           <div style={{ marginTop: 20, color: token.colorWhite, fontSize: 16 }}>
-            正在处理登录...
+            {t('正在处理登录...')}
           </div>
         </div>
       </div>
@@ -117,11 +118,11 @@ export default function AuthCallback() {
       }}>
         <Result
           status="error"
-          title="登录失败"
+          title={t('登录失败')}
           subTitle={errorMessage}
           extra={
             <Button type="primary" onClick={() => navigate('/login')}>
-              返回登录
+              {t('返回登录')}
             </Button>
           }
           style={{ background: token.colorBgContainer, padding: 40, borderRadius: 8 }}
@@ -153,15 +154,15 @@ export default function AuthCallback() {
     const passwordToSet = newPassword || passwordStatus?.default_password;
     
     if (!passwordToSet) {
-      message.error('请输入新密码');
+      message.error(t('请输入新密码'));
       return;
     }
     if (passwordToSet.length < 6) {
-      message.error('密码长度至少为6个字符');
+      message.error(t('密码长度至少为6个字符'));
       return;
     }
     if (newPassword && newPassword !== confirmPassword) {
-      message.error('两次输入的密码不一致');
+      message.error(t('两次输入的密码不一致'));
       return;
     }
 
@@ -171,10 +172,10 @@ export default function AuthCallback() {
       const isFirstLogin = !passwordStatus?.has_password;
       if (isFirstLogin) {
         await authApi.initializePassword(passwordToSet);
-        message.success('密码初始化成功');
+        message.success(t('密码初始化成功'));
       } else {
         await authApi.setPassword(passwordToSet);
-        message.success('密码设置成功');
+        message.success(t('密码设置成功'));
       }
       setShowPasswordModal(false);
 
@@ -196,7 +197,7 @@ export default function AuthCallback() {
         }, 500);
       }
     } catch {
-      message.error('密码设置失败，请重试');
+      message.error(t('密码设置失败，请重试'));
     } finally {
       setSettingPassword(false);
     }
@@ -244,19 +245,19 @@ export default function AuthCallback() {
       />
 
       <Modal
-        title="设置账号密码"
+        title={t('设置账号密码')}
         open={showPasswordModal}
         centered
         onOk={handleSetPassword}
         onCancel={handleSkipPasswordSetting}
         confirmLoading={settingPassword}
-        okText="设置密码"
-        cancelText="暂不设置"
+        okText={t('设置密码')}
+        cancelText={t('暂不设置')}
         width={500}
       >
         <div style={{ marginBottom: 20 }}>
-          <p>您已成功通过 Linux DO 授权登录！</p>
-          <p>系统已为您自动生成默认密码，您可以选择设置自定义密码或继续使用默认密码。</p>
+          <p>{t('您已成功通过 Linux DO 授权登录！')}</p>
+          <p>{t('系统已为您自动生成默认密码，您可以选择设置自定义密码或继续使用默认密码。')}</p>
           {passwordStatus?.default_password && (
             <div style={{
               background: token.colorFillTertiary,
@@ -264,8 +265,8 @@ export default function AuthCallback() {
               borderRadius: 4,
               marginTop: 12
             }}>
-              <strong>账号：</strong>{passwordStatus.username}<br />
-              <strong>默认密码：</strong><code style={{
+              <strong>{t('账号：')}</strong>{passwordStatus.username}<br />
+              <strong>{t('默认密码：')}</strong><code style={{
                 background: token.colorBgContainer,
                 padding: '2px 8px',
                 borderRadius: 3,
@@ -278,20 +279,20 @@ export default function AuthCallback() {
 
         <div style={{ marginTop: 20 }}>
           <div style={{ marginBottom: 12 }}>
-            <label>新密码（至少6个字符）：</label>
+            <label>{t('新密码（至少6个字符）：')}</label>
             <Input.Password
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="请输入新密码"
+              placeholder={t('请输入新密码')}
               style={{ marginTop: 4 }}
             />
           </div>
           <div>
-            <label>确认密码：</label>
+            <label>{t('确认密码：')}</label>
             <Input.Password
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="请再次输入密码"
+              placeholder={t('请再次输入密码')}
               style={{ marginTop: 4 }}
             />
           </div>
@@ -307,8 +308,8 @@ export default function AuthCallback() {
       }}>
         <Result
           status="success"
-          title="登录成功"
-          subTitle={showPasswordModal ? "请设置账号密码..." : (showAnnouncement ? "欢迎使用..." : "正在跳转...")}
+          title={t('登录成功')}
+          subTitle={showPasswordModal ? t('请设置账号密码...') : (showAnnouncement ? t('欢迎使用...') : t('正在跳转...'))}
           style={{ background: alphaColor(token.colorBgContainer, 0.96), padding: 40, borderRadius: 8 }}
         />
       </div>

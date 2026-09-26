@@ -42,7 +42,7 @@ from app.schemas.book_import import (
     BookImportWarning,
     ProjectSuggestion,
 )
-from app.services.ai_service import AIService, create_user_ai_service_with_mcp
+from app.services.ai_service import AIService, create_user_ai_service_with_mcp, get_content_language_from_preferences
 from app.services.prompt_service import PromptService
 from app.services.txt_parser_service import txt_parser_service
 
@@ -1634,6 +1634,7 @@ class BookImportService:
             db_session=db,
             system_prompt=user_settings.system_prompt,
             enable_mcp=enable_mcp,
+            content_language=get_content_language_from_preferences(user_settings.preferences),
         )
 
     async def _run_post_import_wizard_generation(

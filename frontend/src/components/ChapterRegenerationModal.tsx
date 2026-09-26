@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons';
 import { ssePost } from '../utils/sseClient';
 import { SSEProgressModal } from './SSEProgressModal';
+import { t } from '../i18n';
 
 const { TextArea } = Input;
 const { Panel } = Collapse;
@@ -97,19 +98,19 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
       
       // 验证至少提供一种修改指令
       if (values.modification_source === 'custom' && !values.custom_instructions?.trim()) {
-        message.error('请输入自定义修改要求');
+        message.error(t('请输入自定义修改要求'));
         return;
       }
       
       if (values.modification_source === 'analysis_suggestions' && selectedSuggestions.length === 0) {
-        message.error('请选择至少一条分析建议');
+        message.error(t('请选择至少一条分析建议'));
         return;
       }
       
       if (values.modification_source === 'mixed' && 
           selectedSuggestions.length === 0 && 
           !values.custom_instructions?.trim()) {
-        message.error('请至少选择一条建议或输入自定义要求');
+        message.error(t('请至少选择一条建议或输入自定义要求'));
         return;
       }
 
@@ -179,7 +180,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
             setStatus('success');
             const finalWordCount = data.word_count || currentWordCount;
             setWordCount(finalWordCount);
-            message.success('重新生成完成！');
+            message.success(t('重新生成完成！'));
             
             // 直接调用onSuccess打开对比界面，传递最终的累积内容
             setTimeout(() => {
@@ -192,8 +193,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
           onError: (error: string, code?: number) => {
             console.error('SSE Error:', error, code);
             setStatus('error');
-            setErrorMessage(error || '生成失败');
-            message.error('重新生成失败: ' + (error || '未知错误'));
+            setErrorMessage(error || t('生成失败'));
+            message.error(t('重新生成失败: ') + (error || t('未知错误')));
           }
         }
       );
@@ -202,8 +203,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
       console.error('提交失败:', error);
       setStatus('error');
       const err = error as Error;
-      setErrorMessage(err.message || '提交失败');
-      message.error('操作失败: ' + (err.message || '未知错误'));
+      setErrorMessage(err.message || t('提交失败'));
+      message.error(t('操作失败: ') + (err.message || t('未知错误')));
     } finally {
       setLoading(false);
     }
@@ -220,8 +221,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
   const handleCancel = () => {
     if (loading) {
       modal.confirm({
-        title: '确认取消',
-        content: '生成正在进行中，确定要取消吗？',
+        title: t('确认取消'),
+        content: t('生成正在进行中，确定要取消吗？'),
         centered: true,
         onOk: () => {
           setLoading(false);
@@ -238,7 +239,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
     <>
       {contextHolder}
       <Modal
-      title={`重新生成章节 - 第${chapterNumber}章：${chapterTitle}`}
+      title={t('重新生成章节 - 第{{chapterNumber}}章：{{chapterTitle}}', { chapterNumber, chapterTitle })}
       open={visible}
       onCancel={handleCancel}
       width={800}
@@ -247,7 +248,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
         status === 'success' ? null : (
           [
             <Button key="cancel" onClick={handleCancel} disabled={loading}>
-              取消
+              {t('取消')}
             </Button>,
             <Button
               key="submit"
@@ -256,7 +257,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
               loading={loading}
               icon={<ReloadOutlined />}
             >
-              开始重新生成
+              {t('开始重新生成')}
             </Button>
           ]
         )
@@ -265,8 +266,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
 
       {status === 'success' && (
         <Alert
-          message="重新生成成功！"
-          description={`共生成 ${wordCount} 字`}
+          message={t('重新生成成功！')}
+          description={t('共生成 {{wordCount}} 字', { wordCount })}
           type="success"
           showIcon
           icon={<CheckCircleOutlined />}
@@ -276,7 +277,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
 
       {status === 'error' && (
         <Alert
-          message="生成失败"
+          message={t('生成失败')}
           description={errorMessage}
           type="error"
           showIcon
@@ -293,15 +294,15 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
         {/* 修改来源 */}
         <Form.Item
           name="modification_source"
-          label="修改来源"
-          rules={[{ required: true, message: '请选择修改来源' }]}
+          label={t('修改来源')}
+          rules={[{ required: true, message: t('请选择修改来源') }]}
         >
           <Radio.Group onChange={(e) => setModificationSource(e.target.value)}>
-            <Radio value="custom">仅自定义修改</Radio>
+            <Radio value="custom">{t('仅自定义修改')}</Radio>
             {hasAnalysis && suggestions.length > 0 && (
               <>
-                <Radio value="analysis_suggestions">仅分析建议</Radio>
-                <Radio value="mixed">混合模式</Radio>
+                <Radio value="analysis_suggestions">{t('仅分析建议')}</Radio>
+                <Radio value="mixed">{t('混合模式')}</Radio>
               </>
             )}
           </Radio.Group>
@@ -310,7 +311,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
         {/* 分析建议选择 */}
         {hasAnalysis && suggestions.length > 0 && 
          (modificationSource === 'analysis_suggestions' || modificationSource === 'mixed') && (
-          <Form.Item label={`选择分析建议 (${selectedSuggestions.length}/${suggestions.length})`}>
+          <Form.Item label={t('选择分析建议 ({{selectedSuggestionsCount}}/{{suggestionsCount}})', { selectedSuggestionsCount: selectedSuggestions.length, suggestionsCount: suggestions.length })}>
             <Card size="small" style={{ maxHeight: 300, overflow: 'auto' }}>
               <Space direction="vertical" style={{ width: '100%' }}>
                 {suggestions.map((suggestion, index) => (
@@ -339,12 +340,12 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
         {(modificationSource === 'custom' || modificationSource === 'mixed') && (
           <Form.Item
             name="custom_instructions"
-            label="自定义修改要求"
-            tooltip="描述你希望如何改进这个章节"
+            label={t('自定义修改要求')}
+            tooltip={t('描述你希望如何改进这个章节')}
           >
             <TextArea
               rows={4}
-              placeholder="例如：增强情感渲染，让主角的内心戏更加细腻..."
+              placeholder={t('例如：增强情感渲染，让主角的内心戏更加细腻...')}
               showCount
               maxLength={1000}
             />
@@ -353,19 +354,19 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
 
         {/* 高级选项 */}
         <Collapse ghost>
-          <Panel header="高级选项" key="advanced">
+          <Panel header={t('高级选项')} key="advanced">
             {/* 重点优化方向 */}
             <Form.Item
               name="focus_areas"
-              label="重点优化方向"
+              label={t('重点优化方向')}
             >
               <Checkbox.Group>
                 <Space direction="vertical">
-                  <Checkbox value="pacing">节奏把控</Checkbox>
-                  <Checkbox value="emotion">情感渲染</Checkbox>
-                  <Checkbox value="description">场景描写</Checkbox>
-                  <Checkbox value="dialogue">对话质量</Checkbox>
-                  <Checkbox value="conflict">冲突强度</Checkbox>
+                  <Checkbox value="pacing">{t('节奏把控')}</Checkbox>
+                  <Checkbox value="emotion">{t('情感渲染')}</Checkbox>
+                  <Checkbox value="description">{t('场景描写')}</Checkbox>
+                  <Checkbox value="dialogue">{t('对话质量')}</Checkbox>
+                  <Checkbox value="conflict">{t('冲突强度')}</Checkbox>
                 </Space>
               </Checkbox.Group>
             </Form.Item>
@@ -373,13 +374,13 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
             <Divider />
 
             {/* 保留元素 */}
-            <Form.Item label="保留元素">
+            <Form.Item label={t('保留元素')}>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Form.Item name="preserve_structure" valuePropName="checked" noStyle>
-                  <Checkbox>保留整体结构和情节框架</Checkbox>
+                  <Checkbox>{t('保留整体结构和情节框架')}</Checkbox>
                 </Form.Item>
                 <Form.Item name="preserve_character_traits" valuePropName="checked" noStyle>
-                  <Checkbox>保持角色性格一致</Checkbox>
+                  <Checkbox>{t('保持角色性格一致')}</Checkbox>
                 </Form.Item>
               </Space>
             </Form.Item>
@@ -389,8 +390,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
             {/* 生成参数 */}
             <Form.Item
               name="target_word_count"
-              label="目标字数"
-              tooltip="生成内容的目标字数，实际字数可能有±20%的浮动"
+              label={t('目标字数')}
+              tooltip={t('生成内容的目标字数，实际字数可能有±20%的浮动')}
             >
               <InputNumber min={500} max={10000} step={500} style={{ width: '100%' }} />
             </Form.Item>
@@ -403,8 +404,8 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
       <SSEProgressModal
         visible={status === 'generating'}
         progress={progress}
-        message={`正在重新生成中... (已生成 ${wordCount} 字)`}
-        title="重新生成章节"
+        message={t('正在重新生成中... (已生成 {{wordCount}} 字)', { wordCount })}
+        title={t('重新生成章节')}
       />
       </Modal>
     </>

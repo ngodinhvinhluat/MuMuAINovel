@@ -14,6 +14,7 @@ import {
   ColumnHeightOutlined
 } from '@ant-design/icons';
 import type { Chapter } from '../types';
+import { t } from '../i18n';
 
 // 阅读器设置接口
 interface ReaderSettings {
@@ -111,7 +112,7 @@ export default function ChapterReader({
       setLoading(true);
       fetch(`/api/chapters/${chapter.id}/navigation`)
         .then(res => {
-          if (!res.ok) throw new Error('获取导航失败');
+          if (!res.ok) throw new Error(t('获取导航失败'));
           return res.json();
         })
         .then(data => {
@@ -120,7 +121,7 @@ export default function ChapterReader({
         })
         .catch(err => {
           console.error('获取导航信息失败:', err);
-          message.error('获取章节导航信息失败');
+          message.error(t('获取章节导航信息失败'));
           setLoading(false);
         });
     }
@@ -269,7 +270,7 @@ export default function ChapterReader({
           onClick={onClose}
           style={{ color: currentTheme.text }}
         >
-          {!isMobile && '关闭'}
+          {!isMobile && t('关闭')}
         </Button>
         
         <Typography.Title 
@@ -284,7 +285,7 @@ export default function ChapterReader({
             fontSize: isMobile ? 14 : 16
           }}
         >
-          第{chapter.chapter_number}章：{chapter.title}
+          {t('第{{chapter_number}}章：{{title}}', { chapter_number: chapter.chapter_number, title: chapter.title })}
         </Typography.Title>
         
         <Button
@@ -292,7 +293,7 @@ export default function ChapterReader({
           icon={<SettingOutlined />}
           onClick={() => setShowSettings(!showSettings)}
           style={{ color: showSettings ? undefined : currentTheme.text }}
-          title="阅读设置"
+          title={t('阅读设置')}
         />
       </div>
 
@@ -313,7 +314,7 @@ export default function ChapterReader({
             <div style={{ minWidth: isMobile ? '100%' : 200 }}>
               <Space style={{ marginBottom: 8, color: currentTheme.text }}>
                 <FontSizeOutlined />
-                <span>字体大小: {settings.fontSize}px</span>
+                <span>{t('字体大小: {{fontSize}}px', { fontSize: settings.fontSize })}</span>
               </Space>
               <Slider
                 min={14}
@@ -328,7 +329,7 @@ export default function ChapterReader({
             <div style={{ minWidth: isMobile ? '100%' : 200 }}>
               <Space style={{ marginBottom: 8, color: currentTheme.text }}>
                 <ColumnHeightOutlined />
-                <span>行高: {settings.lineHeight}</span>
+                <span>{t('行高: {{lineHeight}}', { lineHeight: settings.lineHeight })}</span>
               </Space>
               <Slider
                 min={1.4}
@@ -344,7 +345,7 @@ export default function ChapterReader({
             <div>
               <Space style={{ marginBottom: 8, color: currentTheme.text }}>
                 <BgColorsOutlined />
-                <span>主题</span>
+                <span>{t('主题')}</span>
               </Space>
               <div>
                 <Radio.Group
@@ -353,9 +354,9 @@ export default function ChapterReader({
                   buttonStyle="solid"
                   size={isMobile ? 'small' : 'middle'}
                 >
-                  <Radio.Button value="light">日间</Radio.Button>
-                  <Radio.Button value="sepia">护眼</Radio.Button>
-                  <Radio.Button value="dark">夜间</Radio.Button>
+                  <Radio.Button value="light">{t('日间')}</Radio.Button>
+                  <Radio.Button value="sepia">{t('护眼')}</Radio.Button>
+                  <Radio.Button value="dark">{t('夜间')}</Radio.Button>
                 </Radio.Group>
               </div>
             </div>
@@ -373,7 +374,7 @@ export default function ChapterReader({
           scrollBehavior: 'smooth'
         }}
       >
-        <Spin spinning={loading} tip="加载中...">
+        <Spin spinning={loading} tip={t('加载中...')}>
           <div
             style={{
               maxWidth: 1000,
@@ -414,7 +415,7 @@ export default function ChapterReader({
               color: currentTheme.text,
               opacity: 0.6
             }}>
-              暂无内容
+              {t('暂无内容')}
             </div>
           )}
           </div>
@@ -439,7 +440,7 @@ export default function ChapterReader({
           onClick={handlePrevious}
           size={isMobile ? 'middle' : 'large'}
         >
-          {!isMobile && '上一章'}
+          {!isMobile && t('上一章')}
         </Button>
         
         <div style={{ 
@@ -447,12 +448,12 @@ export default function ChapterReader({
           color: currentTheme.text,
           fontSize: isMobile ? 12 : 14
         }}>
-          <div>{chapter.word_count || 0} 字</div>
+          <div>{t('{{v1}} 字', { v1: chapter.word_count || 0 })}</div>
           {navigation && (
             <div style={{ fontSize: isMobile ? 10 : 12, opacity: 0.7 }}>
-              {navigation.previous ? `← ${navigation.previous.title}` : '已是第一章'}
+              {navigation.previous ? `← ${navigation.previous.title}` : t('已是第一章')}
               {' | '}
-              {navigation.next ? `${navigation.next.title} →` : '已是最后一章'}
+              {navigation.next ? `${navigation.next.title} →` : t('已是最后一章')}
             </div>
           )}
         </div>
@@ -463,7 +464,7 @@ export default function ChapterReader({
           onClick={handleNext}
           size={isMobile ? 'middle' : 'large'}
         >
-          {!isMobile && '下一章'}
+          {!isMobile && t('下一章')}
           <RightOutlined />
         </Button>
       </div>

@@ -48,6 +48,7 @@ import type {
   User,
 } from '../types';
 import { PROMPT_CATEGORIES } from '../types';
+import { t as tr } from '../i18n';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -168,7 +169,7 @@ export default function PromptWorkshop() {
       setTotal(response.data?.total || 0);
     } catch (error) {
       console.error('Failed to load workshop items:', error);
-      message.error('加载提示词工坊失败');
+      message.error(tr('加载提示词工坊失败'));
     } finally {
       setLoading(false);
     }
@@ -196,12 +197,12 @@ export default function PromptWorkshop() {
     setImportingId(item.id);
     try {
       await promptWorkshopApi.importItem(item.id);
-      message.success(`已导入「${item.name}」到本地写作风格`);
+      message.success(tr('已导入「{{name}}」到本地写作风格', { name: item.name }));
       // 刷新列表更新下载计数
       loadItems();
     } catch (error) {
       console.error('Failed to import item:', error);
-      message.error('导入失败');
+      message.error(tr('导入失败'));
     } finally {
       setImportingId(null);
     }
@@ -219,7 +220,7 @@ export default function PromptWorkshop() {
       ));
     } catch (error) {
       console.error('Failed to toggle like:', error);
-      message.error('操作失败');
+      message.error(tr('操作失败'));
     }
   };
 
@@ -231,7 +232,7 @@ export default function PromptWorkshop() {
         ...values,
         tags: values.tags ? (values.tags as unknown as string).split(',').map((t: string) => t.trim()).filter(Boolean) : [],
       });
-      message.success('提交成功，等待管理员审核');
+      message.success(tr('提交成功，等待管理员审核'));
       setIsSubmitModalOpen(false);
       submitForm.resetFields();
       loadMySubmissions();
@@ -241,7 +242,7 @@ export default function PromptWorkshop() {
       }
     } catch (error) {
       console.error('Failed to submit:', error);
-      message.error('提交失败');
+      message.error(tr('提交失败'));
     } finally {
       setSubmitLoading(false);
     }
@@ -251,7 +252,7 @@ export default function PromptWorkshop() {
   const handleWithdraw = async (submissionId: string) => {
     try {
       await promptWorkshopApi.withdrawSubmission(submissionId);
-      message.success('已撤回');
+      message.success(tr('已撤回'));
       loadMySubmissions();
       // 如果是服务端管理员，刷新待审核列表
       if (isServerAdmin) {
@@ -259,23 +260,23 @@ export default function PromptWorkshop() {
       }
     } catch (error) {
       console.error('Failed to withdraw:', error);
-      message.error('撤回失败');
+      message.error(tr('撤回失败'));
     }
   };
 
   // 删除提交记录（已审核状态）
   const handleDeleteSubmission = async (submission: PromptSubmission) => {
     Modal.confirm({
-      title: '删除提交记录',
-      content: `确定要删除「${submission.name}」的提交记录吗？此操作不可恢复。`,
-      okText: '删除',
+      title: tr('删除提交记录'),
+      content: tr('确定要删除「{{name}}」的提交记录吗？此操作不可恢复。', { name: submission.name }),
+      okText: tr('删除'),
       okType: 'danger',
-      cancelText: '取消',
+      cancelText: tr('取消'),
       centered: true,
       onOk: async () => {
         try {
           await promptWorkshopApi.deleteSubmission(submission.id);
-          message.success('删除成功');
+          message.success(tr('删除成功'));
           loadMySubmissions();
           // 如果是服务端管理员，刷新相关列表
           if (isServerAdmin) {
@@ -283,7 +284,7 @@ export default function PromptWorkshop() {
           }
         } catch (error) {
           console.error('Failed to delete submission:', error);
-          message.error('删除失败');
+          message.error(tr('删除失败'));
         }
       },
     });
@@ -297,7 +298,7 @@ export default function PromptWorkshop() {
       setIsDetailModalOpen(true);
     } catch (error) {
       console.error('Failed to load detail:', error);
-      message.error('加载详情失败');
+      message.error(tr('加载详情失败'));
     }
   };
 
@@ -332,9 +333,9 @@ export default function PromptWorkshop() {
   // 获取提交状态标签
   const getStatusTag = (status: string) => {
     const config: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
-      pending: { color: 'processing', icon: <ClockCircleOutlined />, text: '待审核' },
-      approved: { color: 'success', icon: <CheckCircleOutlined />, text: '已通过' },
-      rejected: { color: 'error', icon: <CloseCircleOutlined />, text: '已拒绝' },
+      pending: { color: 'processing', icon: <ClockCircleOutlined />, text: tr('待审核') },
+      approved: { color: 'success', icon: <CheckCircleOutlined />, text: tr('已通过') },
+      rejected: { color: 'error', icon: <CloseCircleOutlined />, text: tr('已拒绝') },
     };
     const cfg = config[status] || config.pending;
     return <Tag color={cfg.color} icon={cfg.icon}>{cfg.text}</Tag>;
@@ -347,8 +348,8 @@ export default function PromptWorkshop() {
       {serviceStatus && !serviceStatus.cloud_connected && serviceStatus.mode === 'client' && (
         <Alert
           type="warning"
-          message="云端服务未连接"
-          description="无法访问提示词工坊，请检查网络连接或稍后重试"
+          message={tr('云端服务未连接')}
+          description={tr('无法访问提示词工坊，请检查网络连接或稍后重试')}
           icon={<DisconnectOutlined />}
           showIcon
           style={{ marginBottom: 16 }}
@@ -363,7 +364,7 @@ export default function PromptWorkshop() {
         alignItems: 'center',
       }}>
         <Input
-          placeholder="搜索提示词..."
+          placeholder={tr('搜索提示词...')}
           prefix={<SearchOutlined />}
           value={searchKeyword}
           onChange={e => setSearchKeyword(e.target.value)}
@@ -372,7 +373,7 @@ export default function PromptWorkshop() {
           allowClear
         />
         <Select
-          placeholder="选择分类"
+          placeholder={tr('选择分类')}
           value={category}
           onChange={v => { setCategory(v); setCurrentPage(1); }}
           style={{ width: isMobile ? '100%' : 150 }}
@@ -387,15 +388,15 @@ export default function PromptWorkshop() {
           onChange={v => { setSortBy(v); setCurrentPage(1); }}
           style={{ width: isMobile ? '100%' : 120 }}
         >
-          <Select.Option value="newest">最新发布</Select.Option>
-          <Select.Option value="popular">最受欢迎</Select.Option>
-          <Select.Option value="downloads">下载最多</Select.Option>
+          <Select.Option value="newest">{tr('最新发布')}</Select.Option>
+          <Select.Option value="popular">{tr('最受欢迎')}</Select.Option>
+          <Select.Option value="downloads">{tr('下载最多')}</Select.Option>
         </Select>
         <Button
           icon={<SyncOutlined />}
           onClick={() => { setCurrentPage(1); loadItems(); }}
         >
-          刷新
+          {tr('刷新')}
         </Button>
       </div>
     </div>
@@ -407,7 +408,7 @@ export default function PromptWorkshop() {
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 4 }}>
         <Spin spinning={loading}>
           {items.length === 0 ? (
-            <Empty description="暂无提示词" />
+            <Empty description={tr('暂无提示词')} />
           ) : (
               <Row
                 gutter={[0, gridConfig.gutter]}
@@ -443,10 +444,10 @@ export default function PromptWorkshop() {
                       flex: 1,
                     }}
                     actions={[
-                      <Tooltip title="查看详情" key="view">
+                      <Tooltip title={tr('查看详情')} key="view">
                         <EyeOutlined onClick={() => handleViewDetail(item)} />
                       </Tooltip>,
-                      <Tooltip title={item.is_liked ? '取消点赞' : '点赞'} key="like">
+                      <Tooltip title={item.is_liked ? tr('取消点赞') : tr('点赞')} key="like">
                         <span onClick={() => handleLike(item)}>
                           {item.is_liked ? (
                             <HeartFilled style={{ color: token.colorError }} />
@@ -456,7 +457,7 @@ export default function PromptWorkshop() {
                           <span style={{ marginLeft: 4 }}>{item.like_count || 0}</span>
                         </span>
                       </Tooltip>,
-                      <Tooltip title="导入到本地" key="import">
+                      <Tooltip title={tr('导入到本地')} key="import">
                         <Button
                           type="link"
                           size="small"
@@ -517,7 +518,7 @@ export default function PromptWorkshop() {
                     
                     <div style={{ marginTop: 8, color: token.colorTextTertiary, fontSize: 12 }}>
                       <Space>
-                        <span><UserOutlined /> {item.author_name || '匿名'}</span>
+                        <span><UserOutlined /> {item.author_name || tr('匿名')}</span>
                       </Space>
                     </div>
                   </Card>
@@ -545,7 +546,7 @@ export default function PromptWorkshop() {
             pageSize={pageSize}
             onChange={page => setCurrentPage(page)}
             showSizeChanger={false}
-            showTotal={t => `共 ${t} 个提示词`}
+            showTotal={t => tr('共 {{t}} 个提示词', { t })}
           />
         </div>
       )}
@@ -556,15 +557,15 @@ export default function PromptWorkshop() {
   const renderMySubmissions = () => (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text>查看您提交的提示词及审核状态</Text>
+        <Text>{tr('查看您提交的提示词及审核状态')}</Text>
         <Button icon={<SyncOutlined />} onClick={loadMySubmissions}>
-          刷新
+          {tr('刷新')}
         </Button>
       </div>
       
       <Spin spinning={submissionsLoading}>
           {mySubmissions.length === 0 ? (
-            <Empty description="暂无提交记录" />
+            <Empty description={tr('暂无提交记录')} />
           ) : (
             <Row gutter={[0, gridConfig.gutter]} style={{ marginLeft: 0, marginRight: 0 }}>
               {mySubmissions.map(sub => (
@@ -606,14 +607,14 @@ export default function PromptWorkshop() {
                     {sub.status === 'rejected' && sub.review_note && (
                       <Alert
                         type="error"
-                        message="拒绝原因"
+                        message={tr('拒绝原因')}
                         description={sub.review_note}
                         style={{ fontSize: 12 }}
                       />
                     )}
                     
                     <div style={{ fontSize: 12, color: token.colorTextTertiary }}>
-                      提交时间: {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '-'}
+                      {tr('提交时间: {{v1}}', { v1: sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '-' })}
                     </div>
                     
                     <Space>
@@ -625,7 +626,7 @@ export default function PromptWorkshop() {
                           icon={<DeleteOutlined />}
                           onClick={() => handleWithdraw(sub.id)}
                         >
-                          撤回
+                          {tr('撤回')}
                         </Button>
                       )}
                       {sub.status !== 'pending' && (
@@ -636,7 +637,7 @@ export default function PromptWorkshop() {
                           icon={<DeleteOutlined />}
                           onClick={() => handleDeleteSubmission(sub)}
                         >
-                          删除记录
+                          {tr('删除记录')}
                         </Button>
                       )}
                     </Space>
@@ -688,22 +689,22 @@ export default function PromptWorkshop() {
   // 删除已发布的提示词
   const handleDeleteItem = async (item: PromptWorkshopItem) => {
     Modal.confirm({
-      title: '确认删除',
-      content: `确定要删除「${item.name}」吗？此操作不可恢复。`,
-      okText: '删除',
+      title: tr('确认删除'),
+      content: tr('确定要删除「{{name}}」吗？此操作不可恢复。', { name: item.name }),
+      okText: tr('删除'),
       okType: 'danger',
-      cancelText: '取消',
+      cancelText: tr('取消'),
       centered: true,
       onOk: async () => {
         try {
           await promptWorkshopApi.adminDeleteItem(item.id);
-          message.success('删除成功');
+          message.success(tr('删除成功'));
           loadPublishedItems();
           loadAdminSubmissions();
           loadItems();
         } catch (error) {
           console.error('Failed to delete item:', error);
-          message.error('删除失败');
+          message.error(tr('删除失败'));
         }
       },
     });
@@ -719,7 +720,7 @@ export default function PromptWorkshop() {
         ...values,
         tags: values.tags ? values.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
       });
-      message.success('修改成功');
+      message.success(tr('修改成功'));
       setEditModalOpen(false);
       setEditingItem(null);
       editForm.resetFields();
@@ -727,7 +728,7 @@ export default function PromptWorkshop() {
       loadItems();
     } catch (error) {
       console.error('Failed to update item:', error);
-      message.error('修改失败');
+      message.error(tr('修改失败'));
     } finally {
       setEditLoading(false);
     }
@@ -759,7 +760,7 @@ export default function PromptWorkshop() {
         category: values.category,
         tags: values.tags ? values.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : undefined,
       });
-      message.success(action === 'approve' ? '已通过审核' : '已拒绝');
+      message.success(action === 'approve' ? tr('已通过审核') : tr('已拒绝'));
       setReviewModalOpen(false);
       setReviewingSubmission(null);
       reviewForm.resetFields();
@@ -769,7 +770,7 @@ export default function PromptWorkshop() {
       loadPublishedItems();  // 通过时会新增到已发布列表
     } catch (error) {
       console.error('Failed to review:', error);
-      message.error('审核失败');
+      message.error(tr('审核失败'));
     } finally {
       setReviewLoading(false);
     }
@@ -783,7 +784,7 @@ export default function PromptWorkshop() {
         ...values,
         tags: values.tags ? values.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
       });
-      message.success('添加成功');
+      message.success(tr('添加成功'));
       setAddOfficialModalOpen(false);
       addOfficialForm.resetFields();
       loadItems();
@@ -791,7 +792,7 @@ export default function PromptWorkshop() {
       loadPublishedItems();
     } catch (error) {
       console.error('Failed to add official item:', error);
-      message.error('添加失败');
+      message.error(tr('添加失败'));
     } finally {
       setAddOfficialLoading(false);
     }
@@ -805,33 +806,33 @@ export default function PromptWorkshop() {
         <Row gutter={16} style={{ marginBottom: 24 }}>
           <Col span={4}>
             <Card size="small">
-              <Statistic title="总提示词" value={adminStats.total_items} />
+              <Statistic title={tr('总提示词')} value={adminStats.total_items} />
             </Card>
           </Col>
           <Col span={4}>
             <Card size="small">
-              <Statistic title="官方提示词" value={adminStats.total_official} />
+              <Statistic title={tr('官方提示词')} value={adminStats.total_official} />
             </Card>
           </Col>
           <Col span={4}>
             <Card size="small">
-              <Statistic title="待审核" value={adminStats.total_pending} valueStyle={{ color: token.colorWarning }} />
+              <Statistic title={tr('待审核')} value={adminStats.total_pending} valueStyle={{ color: token.colorWarning }} />
             </Card>
           </Col>
           <Col span={4}>
             <Card size="small">
-              <Statistic title="总下载" value={adminStats.total_downloads} />
+              <Statistic title={tr('总下载')} value={adminStats.total_downloads} />
             </Card>
           </Col>
           <Col span={4}>
             <Card size="small">
-              <Statistic title="总点赞" value={adminStats.total_likes} />
+              <Statistic title={tr('总点赞')} value={adminStats.total_likes} />
             </Card>
           </Col>
           <Col span={4}>
             <Card size="small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
               <Button type="primary" icon={<PlusOutlined />} onClick={() => setAddOfficialModalOpen(true)}>
-                添加官方
+                {tr('添加官方')}
               </Button>
             </Card>
           </Col>
@@ -840,15 +841,15 @@ export default function PromptWorkshop() {
       
       {/* 待审核列表 */}
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text strong>待审核提交 ({adminPendingCount})</Text>
+        <Text strong>{tr('待审核提交 ({{adminPendingCount}})', { adminPendingCount })}</Text>
         <Button icon={<SyncOutlined />} onClick={loadAdminSubmissions}>
-          刷新
+          {tr('刷新')}
         </Button>
       </div>
       
       <Spin spinning={adminSubmissionsLoading}>
         {adminSubmissions.length === 0 ? (
-          <Empty description="暂无待审核提交" />
+          <Empty description={tr('暂无待审核提交')} />
         ) : (
           <Row gutter={[0, gridConfig.gutter]} style={{ marginLeft: 0, marginRight: 0 }}>
             {adminSubmissions.map(sub => (
@@ -882,7 +883,7 @@ export default function PromptWorkshop() {
                         setReviewModalOpen(true);
                       }}
                     >
-                      审核
+                      {tr('审核')}
                     </Button>,
                   ]}
                 >
@@ -901,9 +902,9 @@ export default function PromptWorkshop() {
                     </Paragraph>
                     
                     <div style={{ fontSize: 11, color: token.colorTextTertiary }}>
-                      <div>提交者: {sub.submitter_name || '未知'}</div>
-                      <div>来源: {sub.source_instance}</div>
-                      <div>时间: {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '-'}</div>
+                      <div>{tr('提交者: {{v1}}', { v1: sub.submitter_name || tr('未知') })}</div>
+                      <div>{tr('来源: {{source_instance}}', { source_instance: sub.source_instance })}</div>
+                      <div>{tr('时间: {{v1}}', { v1: sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '-' })}</div>
                     </div>
                   </Space>
                 </Card>
@@ -915,15 +916,15 @@ export default function PromptWorkshop() {
       
       {/* 已发布提示词管理 */}
       <div style={{ marginTop: 32, marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text strong>已发布提示词管理 ({publishedItems.length})</Text>
+        <Text strong>{tr('已发布提示词管理 ({{publishedItemsCount}})', { publishedItemsCount: publishedItems.length })}</Text>
         <Button icon={<SyncOutlined />} onClick={loadPublishedItems}>
-          刷新
+          {tr('刷新')}
         </Button>
       </div>
       
       <Spin spinning={publishedLoading}>
         {publishedItems.length === 0 ? (
-          <Empty description="暂无已发布提示词" />
+          <Empty description={tr('暂无已发布提示词')} />
         ) : (
           <Row gutter={[0, gridConfig.gutter]} style={{ marginLeft: 0, marginRight: 0 }}>
             {publishedItems.map(item => (
@@ -944,14 +945,14 @@ export default function PromptWorkshop() {
                   style={{ borderRadius: 12, border: `1px solid ${token.colorBorderSecondary}` }}
                   bodyStyle={{ padding: 16 }}
                   actions={[
-                    <Tooltip title="编辑" key="edit">
+                    <Tooltip title={tr('编辑')} key="edit">
                       <Button
                         type="link"
                         icon={<SettingOutlined />}
                         onClick={() => openEditModal(item)}
                       />
                     </Tooltip>,
-                    <Tooltip title="删除" key="delete">
+                    <Tooltip title={tr('删除')} key="delete">
                       <Button
                         type="link"
                         danger
@@ -964,7 +965,7 @@ export default function PromptWorkshop() {
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text strong ellipsis style={{ maxWidth: 120 }}>{item.name}</Text>
-                      {item.is_official && <Tag color="gold">官方</Tag>}
+                      {item.is_official && <Tag color="gold">{tr('官方')}</Tag>}
                     </div>
                     <Tag color={getCategoryColor(item.category)}>
                       {getCategoryName(item.category)}
@@ -1011,9 +1012,9 @@ export default function PromptWorkshop() {
         }}>
           <h2 style={{ margin: 0, fontSize: isMobile ? 18 : 24, display: 'flex', alignItems: 'center', gap: 8 }}>
             <CloudOutlined />
-            提示词工坊
+            {tr('提示词工坊')}
             {serviceStatus?.mode === 'server' && (
-              <Badge status="success" text="服务端模式" style={{ marginLeft: 8, fontSize: 12 }} />
+              <Badge status="success" text={tr('服务端模式')} style={{ marginLeft: 8, fontSize: 12 }} />
             )}
           </h2>
           <Button
@@ -1021,7 +1022,7 @@ export default function PromptWorkshop() {
             icon={<CloudUploadOutlined />}
             onClick={() => setIsSubmitModalOpen(true)}
           >
-            分享我的提示词
+            {tr('分享我的提示词')}
           </Button>
         </div>
 
@@ -1037,12 +1038,12 @@ export default function PromptWorkshop() {
             }
           }}
           items={[
-            { key: 'browse', label: '浏览工坊' },
+            { key: 'browse', label: tr('浏览工坊') },
             {
               key: 'submissions',
               label: (
                 <Badge count={mySubmissions.filter(s => s.status === 'pending').length} size="small">
-                  我的提交
+                  {tr('我的提交')}
                 </Badge>
               ),
             },
@@ -1050,7 +1051,7 @@ export default function PromptWorkshop() {
               key: 'admin',
               label: (
                 <Badge count={adminPendingCount} size="small">
-                  <span><SettingOutlined /> 管理审核</span>
+                  <span><SettingOutlined /> {tr('管理审核')}</span>
                 </Badge>
               ),
             }] : []),
@@ -1075,7 +1076,7 @@ export default function PromptWorkshop() {
 
       {/* 提交弹窗 */}
       <Modal
-        title="分享提示词到工坊"
+        title={tr('分享提示词到工坊')}
         open={isSubmitModalOpen}
         onCancel={() => {
           setIsSubmitModalOpen(false);
@@ -1087,8 +1088,8 @@ export default function PromptWorkshop() {
       >
         <Alert
           type="info"
-          message="提交须知"
-          description="您的提示词将提交给管理员审核，审核通过后会在工坊中展示。请确保内容原创且不含敏感信息。"
+          message={tr('提交须知')}
+          description={tr('您的提示词将提交给管理员审核，审核通过后会在工坊中展示。请确保内容原创且不含敏感信息。')}
           style={{ marginBottom: 16 }}
           showIcon
         />
@@ -1100,47 +1101,47 @@ export default function PromptWorkshop() {
         >
           <Form.Item
             name="name"
-            label="名称"
-            rules={[{ required: true, message: '请输入名称' }]}
+            label={tr('名称')}
+            rules={[{ required: true, message: tr('请输入名称') }]}
           >
-            <Input placeholder="给您的提示词起个名字" maxLength={50} />
+            <Input placeholder={tr('给您的提示词起个名字')} maxLength={50} />
           </Form.Item>
           
           <Form.Item
             name="category"
-            label="分类"
-            rules={[{ required: true, message: '请选择分类' }]}
+            label={tr('分类')}
+            rules={[{ required: true, message: tr('请选择分类') }]}
           >
-            <Select placeholder="选择分类">
+            <Select placeholder={tr('选择分类')}>
               {categoryOptions.map(cat => (
                 <Select.Option key={cat.value} value={cat.value}>{cat.label}</Select.Option>
               ))}
             </Select>
           </Form.Item>
           
-          <Form.Item name="description" label="描述">
-            <TextArea rows={2} placeholder="简要描述这个提示词的用途和效果" maxLength={200} />
+          <Form.Item name="description" label={tr('描述')}>
+            <TextArea rows={2} placeholder={tr('简要描述这个提示词的用途和效果')} maxLength={200} />
           </Form.Item>
           
           <Form.Item
             name="prompt_content"
-            label="提示词内容"
-            rules={[{ required: true, message: '请输入提示词内容' }]}
+            label={tr('提示词内容')}
+            rules={[{ required: true, message: tr('请输入提示词内容') }]}
           >
-            <TextArea rows={6} placeholder="输入完整的提示词内容..." />
+            <TextArea rows={6} placeholder={tr('输入完整的提示词内容...')} />
           </Form.Item>
           
           <Form.Item
             name="author_display_name"
-            label="作者署名"
-            rules={[{ required: true, message: '请输入作者署名' }]}
-            tooltip="发布后显示的作者名称"
+            label={tr('作者署名')}
+            rules={[{ required: true, message: tr('请输入作者署名') }]}
+            tooltip={tr('发布后显示的作者名称')}
           >
-            <Input placeholder="请输入作者署名（必填）" maxLength={50} />
+            <Input placeholder={tr('请输入作者署名（必填）')} maxLength={50} />
           </Form.Item>
           
-          <Form.Item name="tags" label="标签">
-            <Input placeholder="输入标签，多个用逗号分隔，如: 武侠,对话,细腻" />
+          <Form.Item name="tags" label={tr('标签')}>
+            <Input placeholder={tr('输入标签，多个用逗号分隔，如: 武侠,对话,细腻')} />
           </Form.Item>
           
           <Form.Item>
@@ -1149,10 +1150,10 @@ export default function PromptWorkshop() {
                 setIsSubmitModalOpen(false);
                 submitForm.resetFields();
               }}>
-                取消
+                {tr('取消')}
               </Button>
               <Button type="primary" htmlType="submit" loading={submitLoading}>
-                提交审核
+                {tr('提交审核')}
               </Button>
             </Space>
           </Form.Item>
@@ -1169,7 +1170,7 @@ export default function PromptWorkshop() {
         }}
         footer={[
           <Button key="close" onClick={() => setIsDetailModalOpen(false)}>
-            关闭
+            {tr('关闭')}
           </Button>,
           <Button
             key="import"
@@ -1178,7 +1179,7 @@ export default function PromptWorkshop() {
             loading={importingId === detailItem?.id}
             onClick={() => detailItem && handleImport(detailItem)}
           >
-            导入到本地
+            {tr('导入到本地')}
           </Button>,
         ]}
         width={isMobile ? '100%' : 700}
@@ -1209,7 +1210,7 @@ export default function PromptWorkshop() {
               maxHeight: 400,
               overflow: 'auto',
             }}>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>提示词内容</Text>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>{tr('提示词内容')}</Text>
               <pre style={{
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
@@ -1222,15 +1223,15 @@ export default function PromptWorkshop() {
             
             <Row gutter={16}>
               <Col span={8}>
-                <Text type="secondary">作者</Text>
-                <div><UserOutlined /> {detailItem.author_name || '匿名'}</div>
+                <Text type="secondary">{tr('作者')}</Text>
+                <div><UserOutlined /> {detailItem.author_name || tr('匿名')}</div>
               </Col>
               <Col span={8}>
-                <Text type="secondary">点赞</Text>
+                <Text type="secondary">{tr('点赞')}</Text>
                 <div><HeartOutlined /> {detailItem.like_count || 0}</div>
               </Col>
               <Col span={8}>
-                <Text type="secondary">下载</Text>
+                <Text type="secondary">{tr('下载')}</Text>
                 <div><DownloadOutlined /> {detailItem.download_count || 0}</div>
               </Col>
             </Row>
@@ -1239,7 +1240,7 @@ export default function PromptWorkshop() {
       </Modal>
       {/* 审核弹窗 */}
       <Modal
-        title={`审核: ${reviewingSubmission?.name}`}
+        title={tr('审核: {{name}}', { name: reviewingSubmission?.name })}
         open={reviewModalOpen}
         onCancel={() => {
           setReviewModalOpen(false);
@@ -1260,7 +1261,7 @@ export default function PromptWorkshop() {
               maxHeight: 300,
               overflow: 'auto',
             }}>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>提示词内容预览</Text>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>{tr('提示词内容预览')}</Text>
               <pre style={{
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
@@ -1272,7 +1273,7 @@ export default function PromptWorkshop() {
             </div>
             
             <Form form={reviewForm} layout="vertical">
-              <Form.Item name="category" label="分类（可修改）">
+              <Form.Item name="category" label={tr('分类（可修改）')}>
                 <Select>
                   {categoryOptions.map(cat => (
                     <Select.Option key={cat.value} value={cat.value}>{cat.label}</Select.Option>
@@ -1280,24 +1281,24 @@ export default function PromptWorkshop() {
                 </Select>
               </Form.Item>
               
-              <Form.Item name="tags" label="标签（可修改，逗号分隔）">
-                <Input placeholder="武侠, 对话, 细腻" />
+              <Form.Item name="tags" label={tr('标签（可修改，逗号分隔）')}>
+                <Input placeholder={tr('武侠, 对话, 细腻')} />
               </Form.Item>
               
-              <Form.Item name="review_note" label="审核备注">
-                <TextArea rows={2} placeholder="拒绝时请填写原因..." />
+              <Form.Item name="review_note" label={tr('审核备注')}>
+                <TextArea rows={2} placeholder={tr('拒绝时请填写原因...')} />
               </Form.Item>
               
               <Form.Item>
                 <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
                   <Button onClick={() => setReviewModalOpen(false)}>
-                    取消
+                    {tr('取消')}
                   </Button>
                   <Button danger loading={reviewLoading} onClick={() => handleReview('reject')}>
-                    拒绝
+                    {tr('拒绝')}
                   </Button>
                   <Button type="primary" loading={reviewLoading} onClick={() => handleReview('approve')}>
-                    通过
+                    {tr('通过')}
                   </Button>
                 </Space>
               </Form.Item>
@@ -1308,7 +1309,7 @@ export default function PromptWorkshop() {
 
       {/* 添加官方提示词弹窗 */}
       <Modal
-        title="添加官方提示词"
+        title={tr('添加官方提示词')}
         open={addOfficialModalOpen}
         onCancel={() => {
           setAddOfficialModalOpen(false);
@@ -1325,38 +1326,38 @@ export default function PromptWorkshop() {
         >
           <Form.Item
             name="name"
-            label="名称"
-            rules={[{ required: true, message: '请输入名称' }]}
+            label={tr('名称')}
+            rules={[{ required: true, message: tr('请输入名称') }]}
           >
-            <Input placeholder="提示词名称" maxLength={50} />
+            <Input placeholder={tr('提示词名称')} maxLength={50} />
           </Form.Item>
           
           <Form.Item
             name="category"
-            label="分类"
-            rules={[{ required: true, message: '请选择分类' }]}
+            label={tr('分类')}
+            rules={[{ required: true, message: tr('请选择分类') }]}
           >
-            <Select placeholder="选择分类">
+            <Select placeholder={tr('选择分类')}>
               {categoryOptions.map(cat => (
                 <Select.Option key={cat.value} value={cat.value}>{cat.label}</Select.Option>
               ))}
             </Select>
           </Form.Item>
           
-          <Form.Item name="description" label="描述">
-            <TextArea rows={2} placeholder="简要描述" maxLength={200} />
+          <Form.Item name="description" label={tr('描述')}>
+            <TextArea rows={2} placeholder={tr('简要描述')} maxLength={200} />
           </Form.Item>
           
           <Form.Item
             name="prompt_content"
-            label="提示词内容"
-            rules={[{ required: true, message: '请输入提示词内容' }]}
+            label={tr('提示词内容')}
+            rules={[{ required: true, message: tr('请输入提示词内容') }]}
           >
-            <TextArea rows={8} placeholder="输入完整的提示词内容..." />
+            <TextArea rows={8} placeholder={tr('输入完整的提示词内容...')} />
           </Form.Item>
           
-          <Form.Item name="tags" label="标签">
-            <Input placeholder="逗号分隔，如: 武侠,对话,细腻" />
+          <Form.Item name="tags" label={tr('标签')}>
+            <Input placeholder={tr('逗号分隔，如: 武侠,对话,细腻')} />
           </Form.Item>
           
           <Form.Item>
@@ -1365,10 +1366,10 @@ export default function PromptWorkshop() {
                 setAddOfficialModalOpen(false);
                 addOfficialForm.resetFields();
               }}>
-                取消
+                {tr('取消')}
               </Button>
               <Button type="primary" htmlType="submit" loading={addOfficialLoading}>
-                添加
+                {tr('添加')}
               </Button>
             </Space>
           </Form.Item>
@@ -1377,7 +1378,7 @@ export default function PromptWorkshop() {
 
       {/* 编辑提示词弹窗 */}
       <Modal
-        title={`编辑: ${editingItem?.name}`}
+        title={tr('编辑: {{name}}', { name: editingItem?.name })}
         open={editModalOpen}
         onCancel={() => {
           setEditModalOpen(false);
@@ -1395,38 +1396,38 @@ export default function PromptWorkshop() {
         >
           <Form.Item
             name="name"
-            label="名称"
-            rules={[{ required: true, message: '请输入名称' }]}
+            label={tr('名称')}
+            rules={[{ required: true, message: tr('请输入名称') }]}
           >
-            <Input placeholder="提示词名称" maxLength={50} />
+            <Input placeholder={tr('提示词名称')} maxLength={50} />
           </Form.Item>
           
           <Form.Item
             name="category"
-            label="分类"
-            rules={[{ required: true, message: '请选择分类' }]}
+            label={tr('分类')}
+            rules={[{ required: true, message: tr('请选择分类') }]}
           >
-            <Select placeholder="选择分类">
+            <Select placeholder={tr('选择分类')}>
               {categoryOptions.map(cat => (
                 <Select.Option key={cat.value} value={cat.value}>{cat.label}</Select.Option>
               ))}
             </Select>
           </Form.Item>
           
-          <Form.Item name="description" label="描述">
-            <TextArea rows={2} placeholder="简要描述" maxLength={200} />
+          <Form.Item name="description" label={tr('描述')}>
+            <TextArea rows={2} placeholder={tr('简要描述')} maxLength={200} />
           </Form.Item>
           
           <Form.Item
             name="prompt_content"
-            label="提示词内容"
-            rules={[{ required: true, message: '请输入提示词内容' }]}
+            label={tr('提示词内容')}
+            rules={[{ required: true, message: tr('请输入提示词内容') }]}
           >
-            <TextArea rows={8} placeholder="输入完整的提示词内容..." />
+            <TextArea rows={8} placeholder={tr('输入完整的提示词内容...')} />
           </Form.Item>
           
-          <Form.Item name="tags" label="标签">
-            <Input placeholder="逗号分隔，如: 武侠,对话,细腻" />
+          <Form.Item name="tags" label={tr('标签')}>
+            <Input placeholder={tr('逗号分隔，如: 武侠,对话,细腻')} />
           </Form.Item>
           
           <Form.Item>
@@ -1436,10 +1437,10 @@ export default function PromptWorkshop() {
                 setEditingItem(null);
                 editForm.resetFields();
               }}>
-                取消
+                {tr('取消')}
               </Button>
               <Button type="primary" htmlType="submit" loading={editLoading}>
-                保存修改
+                {tr('保存修改')}
               </Button>
             </Space>
           </Form.Item>

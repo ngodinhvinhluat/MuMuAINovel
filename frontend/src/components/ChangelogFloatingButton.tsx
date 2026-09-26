@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FloatButton, Grid } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import ChangelogModal from './ChangelogModal';
+import { t } from '../i18n';
 
 const { useBreakpoint } = Grid;
 
@@ -15,7 +16,7 @@ export default function ChangelogFloatingButton() {
       <FloatButton
         icon={<FileTextOutlined />}
         type="primary"
-        tooltip="查看更新日志"
+        tooltip={t('查看更新日志')}
         style={{
           // 桌面端时，确保按钮在主内容区域内（侧边栏右侧）
           right: 24,

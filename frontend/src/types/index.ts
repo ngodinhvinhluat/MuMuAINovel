@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // 用户类型定义
 export interface User {
   user_id: string;
@@ -1346,14 +1347,14 @@ export interface AnnouncementStatusResponse {
 
 // 提示词工坊分类常量
 export const PROMPT_CATEGORIES: Record<string, string> = {
-  general: '通用',
-  fantasy: '玄幻/仙侠',
-  martial: '武侠',
-  romance: '言情',
-  scifi: '科幻',
-  horror: '悬疑/惊悚',
-  history: '历史',
-  urban: '都市',
-  game: '游戏/电竞',
-  other: '其他',
+  general: t('通用'),
+  fantasy: t('玄幻/仙侠'),
+  martial: t('武侠'),
+  romance: t('言情'),
+  scifi: t('科幻'),
+  horror: t('悬疑/惊悚'),
+  history: t('历史'),
+  urban: t('都市'),
+  game: t('游戏/电竞'),
+  other: t('其他'),
 };
