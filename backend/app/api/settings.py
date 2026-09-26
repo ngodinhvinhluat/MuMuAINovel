@@ -25,7 +25,10 @@ from app.schemas.settings import (
 from app.user_manager import User
 from app.logger import get_logger, safe_preview
 from app.config import settings as app_settings, PROJECT_ROOT
-from app.services.ai_service import AIService, create_user_ai_service, create_user_ai_service_with_mcp, normalize_provider
+from app.services.ai_service import (
+    AIService, create_user_ai_service, create_user_ai_service_with_mcp, normalize_provider,
+    get_content_language_from_preferences, normalize_content_language, SUPPORTED_CONTENT_LANGUAGES,
+)
 from app.services.email_service import email_service
 from app.security import validate_ai_http_url
 
@@ -141,6 +144,7 @@ def _build_ai_service_from_config(
     user_id: str,
     db: AsyncSession,
     enable_mcp: bool,
+    content_language: Optional[str] = None,
 ) -> AIService:
     """基于指定配置创建AI服务。"""
     resolved_config = resolve_runtime_ai_config(
@@ -159,6 +163,7 @@ def _build_ai_service_from_config(
         db_session=db,
         system_prompt=config.get('system_prompt'),
         enable_mcp=enable_mcp,
+        content_language=content_language,
     )
 
 
@@ -269,6 +274,7 @@ async def get_user_ai_service(
         system_prompt=settings.system_prompt,
         enable_mcp=enable_mcp,         # 根据MCP插件状态动态决定
         disable_thinking=bool(getattr(settings, 'disable_thinking', False)),
+        content_language=get_content_language_from_preferences(settings.preferences),
     )
 
 
@@ -319,6 +325,7 @@ async def get_user_ai_service_from_db_by_usage(
                     user_id=user_id,
                     db=db,
                     enable_mcp=enable_mcp,
+                    content_language=get_content_language_from_preferences(settings.preferences),
                 )
             logger.warning(f"用户 {user_id} 配置的章节内容分析预设不存在，回退默认API配置: {preset_id}")
 
@@ -335,6 +342,7 @@ async def get_user_ai_service_from_db_by_usage(
         system_prompt=settings.system_prompt,
         enable_mcp=enable_mcp,
         disable_thinking=bool(getattr(settings, 'disable_thinking', False)),
+        content_language=get_content_language_from_preferences(settings.preferences),
     )
 
 
@@ -1427,6 +1435,47 @@ async def activate_preset(
         "preset_id": preset_id,
         "preset_name": target_preset['name']
     }
+
+
+class ContentLanguageRequest(BaseModel):
+    content_language: str
+
+
+@router.get("/content-language")
+async def get_content_language(
+    user: User = Depends(require_login),
+    db: AsyncSession = Depends(get_db)
+):
+    """获取 AI 生成内容语言（保存在 preferences JSON 中，默认 zh）。"""
+    settings = await get_user_settings(user.user_id, db)
+    return {
+        "content_language": get_content_language_from_preferences(settings.preferences),
+        "supported": list(SUPPORTED_CONTENT_LANGUAGES),
+    }
+
+
+@router.put("/content-language")
+async def set_content_language(
+    data: ContentLanguageRequest,
+    user: User = Depends(require_login),
+    db: AsyncSession = Depends(get_db)
+):
+    """设置 AI 生成内容语言：zh（中文，默认）或 vi（越南语）。"""
+    raw = (data.content_language or "").strip().lower()
+    if raw not in SUPPORTED_CONTENT_LANGUAGES:
+        raise HTTPException(status_code=400, detail=f"不支持的内容语言: {data.content_language}")
+    language = normalize_content_language(raw)
+
+    settings = await get_user_settings(user.user_id, db)
+    prefs = _safe_load_preferences(settings.preferences)
+    if not isinstance(prefs, dict):
+        prefs = {}
+    prefs['content_language'] = language
+    settings.preferences = json.dumps(prefs, ensure_ascii=False)
+    await db.commit()
+
+    logger.info(f"用户 {user.user_id} 设置AI内容语言: {language}")
+    return {"message": "内容语言已更新", "content_language": language}
 
 
 @router.put("/presets/usage/chapter-analysis")
