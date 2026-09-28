@@ -33,7 +33,7 @@ import {
 } from '@ant-design/icons';
 import { mcpPluginApi, settingsApi } from '../services/api';
 import type { MCPPlugin, MCPTool } from '../types';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { Paragraph, Text, Title } = Typography;
 const { TextArea } = Input;
@@ -598,7 +598,7 @@ export default function MCPPluginsPage() {
       loadPlugins();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      const errorMsg = err?.response?.data?.detail || t('操作失败');
+      const errorMsg = label(err?.response?.data?.detail) || t('操作失败');
       message.error(errorMsg);
     } finally {
       setLoading(false);

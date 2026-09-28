@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import { ssePost } from '../utils/sseClient';
 import { SSEProgressModal } from './SSEProgressModal';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Panel } = Collapse;
@@ -325,7 +325,7 @@ const ChapterRegenerationModal: React.FC<ChapterRegenerationModalProps> = ({
                         suggestion.priority === 'high' ? 'red' :
                         suggestion.priority === 'medium' ? 'orange' : 'blue'
                       }>
-                        {suggestion.category}
+                        {label(suggestion.category)}
                       </Tag>
                       <span style={{ fontSize: 13 }}>{suggestion.content}</span>
                     </Space>

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import type { Project } from '../types';
 import { bookshelfCardStyles, bookshelfCardHoverHandlers } from '../components/CardStyles';
 import { useThemeMode } from '../theme/useThemeMode';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 const { Paragraph } = Typography;
 
@@ -524,7 +524,7 @@ export default function BookshelfPage({
                                 fontWeight: 500,
                                 backdropFilter: 'blur(8px)',
                               }}>
-                                {tag}
+                                {label(tag)}
                               </Tag>
                             )) : (
                               <Tag style={{
@@ -769,7 +769,7 @@ export default function BookshelfPage({
                                     lineHeight: isMobile ? '18px' : '20px',
                                     fontWeight: 500,
                                   }}>
-                                    {tag}
+                                    {label(tag)}
                                   </Tag>
                                 )) : (
                                   <Tag style={{

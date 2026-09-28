@@ -13,7 +13,7 @@ import {
 import api from '../services/api';
 import AnnotatedText, { type MemoryAnnotation } from '../components/AnnotatedText';
 import MemorySidebar from '../components/MemorySidebar';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 interface ChapterData {
   id: string;
@@ -140,7 +140,7 @@ const ChapterReader: React.FC = () => {
     } catch (err: unknown) {
       console.error('加载章节数据失败:', err);
       const error = err as { response?: { data?: { detail?: string } }; message?: string };
-      setError(error.response?.data?.detail || error.message || t('加载失败'));
+      setError(label(error.response?.data?.detail) || error.message || t('加载失败'));
     } finally {
       setLoading(false);
     }
@@ -262,7 +262,7 @@ const ChapterReader: React.FC = () => {
       }
       const error = err as { response?: { data?: { detail?: string } } };
       message.error({
-        content: error.response?.data?.detail || t('触发分析失败'),
+        content: label(error.response?.data?.detail) || t('触发分析失败'),
         key: 'analyze'
       });
     }

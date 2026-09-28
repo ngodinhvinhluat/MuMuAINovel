@@ -73,7 +73,7 @@ import type {
   AgentToolDecision,
   AgentExecutionStep,
 } from '../types';
-import { t } from '../i18n';
+import { label, t } from '../i18n';
 
 interface MCPPluginSimpleCreate {
   config_json: string;
@@ -98,6 +98,9 @@ api.interceptors.request.use(
   }
 );
 
+// Dịch thông báo lỗi backend qua lớp nghĩa; dạng không phải chuỗi (mảng lỗi 422) trả về '' để dùng thông báo mặc định.
+const labelDetail = (detail: unknown): string => label(detail);
+
 api.interceptors.response.use(
   (response) => {
     return response.data;
@@ -111,7 +114,7 @@ api.interceptors.response.use(
 
       switch (status) {
         case 400:
-          errorMessage = data?.detail || t('请求参数错误');
+          errorMessage = labelDetail(data?.detail) || t('请求参数错误');
           break;
         case 401: {
           const backendDetail = data?.detail || data?.message;
@@ -123,7 +126,7 @@ api.interceptors.response.use(
           ];
           const isUnauthenticated = unauthenticatedDetails.includes(backendDetail);
 
-          errorMessage = backendDetail ? t(backendDetail) : t('登录状态已失效，请重新登录');
+          errorMessage = backendDetail ? labelDetail(backendDetail) : t('登录状态已失效，请重新登录');
 
           if (isUnauthenticated && window.location.pathname !== '/login') {
             window.location.href = '/login';
@@ -131,25 +134,25 @@ api.interceptors.response.use(
           break;
         }
         case 403:
-          errorMessage = data?.detail || t('没有权限访问');
+          errorMessage = labelDetail(data?.detail) || t('没有权限访问');
           break;
         case 404:
-          errorMessage = data?.detail || t('请求的资源不存在');
+          errorMessage = labelDetail(data?.detail) || t('请求的资源不存在');
           break;
         case 422:
-          errorMessage = data?.detail || t('请求参数验证失败');
+          errorMessage = labelDetail(data?.detail) || t('请求参数验证失败');
           if (data?.errors) {
             console.error('验证错误详情:', data.errors);
           }
           break;
         case 500:
-          errorMessage = data?.detail || t('服务器内部错误');
+          errorMessage = labelDetail(data?.detail) || t('服务器内部错误');
           break;
         case 503:
           errorMessage = t('服务暂时不可用，请稍后重试');
           break;
         default:
-          errorMessage = data?.detail || data?.message || t('请求失败 ({{status}})', { status });
+          errorMessage = labelDetail(data?.detail || data?.message) || t('请求失败 ({{status}})', { status });
       }
     } else if (error.request) {
       errorMessage = t('网络错误，请检查网络连接');

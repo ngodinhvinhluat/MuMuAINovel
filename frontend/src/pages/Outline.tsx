@@ -8,7 +8,7 @@ import { useOutlineSync } from '../store/hooks';
 import { generateOutlineBackground } from '../services/backgroundTaskService';
 import { outlineApi, chapterApi, projectApi, characterApi } from '../services/api';
 import type { ApiError, Character, OutlineImportMode, OutlineImportPreview } from '../types';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 // 大纲生成请求数据类型
 interface OutlineGenerateRequestData {
@@ -1082,7 +1082,7 @@ export default function Outline() {
       }
     } catch (error: unknown) {
       const apiError = error as ApiError;
-      message.error(apiError.response?.data?.detail || tr('删除章节失败'));
+      message.error(label(apiError.response?.data?.detail) || tr('删除章节失败'));
     }
   };
 

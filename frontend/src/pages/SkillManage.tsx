@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Input, Tag, Space, message, Popconfirm, Card, theme, Empty, Badge, Tooltip, Select } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, ThunderboltOutlined, FileTextOutlined } from '@ant-design/icons';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 const { TextArea } = Input;
 
@@ -289,7 +289,7 @@ export default function SkillManage() {
           'Skill·工具': 'purple',
           'Skill': 'default',
         };
-        return <Tag color={colorMap[cat] || 'default'}>{tr(cat)}</Tag>;
+        return <Tag color={colorMap[cat] || 'default'}>{label(cat)}</Tag>;
       },
     },
     {

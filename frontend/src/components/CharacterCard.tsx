@@ -2,7 +2,7 @@ import { Card, Space, Tag, Typography, Popconfirm, theme } from 'antd';
 import { EditOutlined, DeleteOutlined, UserOutlined, BankOutlined, ExportOutlined } from '@ant-design/icons';
 import { characterCardStyles } from './CardStyles';
 import type { Character } from '../types';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { Text, Paragraph } = Typography;
 
@@ -119,7 +119,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                 {character.gender && (
                   <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('性别：')}</Text>
-                    <Text style={{ flex: 1 }}>{t(character.gender)}</Text>
+                    <Text style={{ flex: 1 }}>{label(character.gender)}</Text>
                   </div>
                 )}
                 {character.personality && (

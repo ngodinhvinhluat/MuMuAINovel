@@ -5,7 +5,7 @@ import { useStore } from '../store';
 import { worldSettingCardStyles } from '../components/CardStyles';
 import { projectApi, wizardStreamApi } from '../services/api';
 import { SSELoadingOverlay } from '../components/SSELoadingOverlay';
-import { t } from '../i18n';
+import { t, label, labelList } from '../i18n';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -266,8 +266,8 @@ export default function WorldSetting() {
               <Descriptions.Item label={t('小说简介')}>{currentProject.description}</Descriptions.Item>
             )}
             <Descriptions.Item label={t('小说主题')}>{currentProject.theme || t('未设定')}</Descriptions.Item>
-            <Descriptions.Item label={t('小说类型')}>{currentProject.genre || t('未设定')}</Descriptions.Item>
-            <Descriptions.Item label={t('叙事视角')}>{currentProject.narrative_perspective || t('未设定')}</Descriptions.Item>
+            <Descriptions.Item label={t('小说类型')}>{labelList(currentProject.genre) || t('未设定')}</Descriptions.Item>
+            <Descriptions.Item label={t('叙事视角')}>{label(currentProject.narrative_perspective) || t('未设定')}</Descriptions.Item>
             <Descriptions.Item label={t('目标字数')}>
               {currentProject.target_words ? t('{{target_words}} 字', { target_words: currentProject.target_words.toLocaleString() }) : t('未设定')}
             </Descriptions.Item>

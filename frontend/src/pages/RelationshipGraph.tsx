@@ -21,7 +21,7 @@ import {
 } from '@xyflow/react';
 import type { Node, Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 // 关系名称在数据层保持中文（用于前缀判断），仅在显示时翻译
 const translateRelationshipLabel = (name: string): string => {
@@ -1449,7 +1449,7 @@ export default function RelationshipGraph() {
                           : t('配角')}
                     </Tag>
                   )}
-                  {nodeDetail.gender && !nodeDetail.is_organization && <Tag style={{ borderRadius: 12, padding: '0 10px' }}>{nodeDetail.gender}</Tag>}
+                  {nodeDetail.gender && !nodeDetail.is_organization && <Tag style={{ borderRadius: 12, padding: '0 10px' }}>{label(nodeDetail.gender)}</Tag>}
                   {nodeDetail.age && !nodeDetail.is_organization && <Tag style={{ borderRadius: 12, padding: '0 10px' }}>{t('{{age}}岁', { age: nodeDetail.age })}</Tag>}
                 </Space>
               </div>

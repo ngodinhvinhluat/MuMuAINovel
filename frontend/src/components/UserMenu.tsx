@@ -5,7 +5,7 @@ import { authApi } from '../services/api';
 import type { User } from '../types';
 import type { MenuProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { t, getLanguage, setLanguage, SUPPORTED_LANGUAGES } from '../i18n';
+import { t, getLanguage, setLanguage, SUPPORTED_LANGUAGES, label } from '../i18n';
 
 const { Text } = Typography;
 
@@ -67,7 +67,7 @@ export default function UserMenu({ showFullInfo = false, compact = false }: User
     } catch (error: unknown) {
       console.error('修改密码失败:', error);
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || t('修改密码失败'));
+      message.error(label(err.response?.data?.detail) || t('修改密码失败'));
     } finally {
       setChangingPassword(false);
     }

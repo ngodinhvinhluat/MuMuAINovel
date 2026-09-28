@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Modal, Form, Select, InputNumber, Input, message, Progress, Tag, Space, Divider, Typography, theme } from 'antd';
 import { EditOutlined, PlusOutlined, DeleteOutlined, TrophyOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -72,7 +72,7 @@ export const CharacterCareerCard: React.FC<Props> = ({
             setSubCareers(response.data.sub_careers || []);
         } catch (error: unknown) {
             const axiosError = error as { response?: { data?: { detail?: string } } };
-            message.error(axiosError.response?.data?.detail || t('获取职业信息失败'));
+            message.error(label(axiosError.response?.data?.detail) || t('获取职业信息失败'));
         } finally {
             setLoading(false);
         }
@@ -113,7 +113,7 @@ export const CharacterCareerCard: React.FC<Props> = ({
             onUpdate?.();
         } catch (error: unknown) {
             const axiosError = error as { response?: { data?: { detail?: string } } };
-            message.error(axiosError.response?.data?.detail || t('设置主职业失败'));
+            message.error(label(axiosError.response?.data?.detail) || t('设置主职业失败'));
         }
     };
 
@@ -131,7 +131,7 @@ export const CharacterCareerCard: React.FC<Props> = ({
             onUpdate?.();
         } catch (error: unknown) {
             const axiosError = error as { response?: { data?: { detail?: string } } };
-            message.error(axiosError.response?.data?.detail || t('添加副职业失败'));
+            message.error(label(axiosError.response?.data?.detail) || t('添加副职业失败'));
         }
     };
 
@@ -151,7 +151,7 @@ export const CharacterCareerCard: React.FC<Props> = ({
             onUpdate?.();
         } catch (error: unknown) {
             const axiosError = error as { response?: { data?: { detail?: string } } };
-            message.error(axiosError.response?.data?.detail || t('更新职业阶段失败'));
+            message.error(label(axiosError.response?.data?.detail) || t('更新职业阶段失败'));
         }
     };
 
@@ -171,7 +171,7 @@ export const CharacterCareerCard: React.FC<Props> = ({
                     onUpdate?.();
                 } catch (error: unknown) {
                     const axiosError = error as { response?: { data?: { detail?: string } } };
-                    message.error(axiosError.response?.data?.detail || t('删除副职业失败'));
+                    message.error(label(axiosError.response?.data?.detail) || t('删除副职业失败'));
                 }
             }
         });

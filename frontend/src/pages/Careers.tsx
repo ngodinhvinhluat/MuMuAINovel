@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import SSEProgressModal from '../components/SSEProgressModal';
 import { eventBus, EventNames } from '../store/eventBus';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Title, Text, Paragraph } = Typography;
@@ -152,7 +152,7 @@ export default function Careers() {
             fetchCareers();
         } catch (error: unknown) {
             const axiosError = error as { response?: { data?: { detail?: string } } };
-            message.error(axiosError.response?.data?.detail || t('操作失败'));
+            message.error(label(axiosError.response?.data?.detail) || t('操作失败'));
         }
     };
 
@@ -168,7 +168,7 @@ export default function Careers() {
                     fetchCareers();
                 } catch (error: unknown) {
                     const axiosError = error as { response?: { data?: { detail?: string } } };
-                    message.error(axiosError.response?.data?.detail || t('删除失败'));
+                    message.error(label(axiosError.response?.data?.detail) || t('删除失败'));
                 }
             }
         });

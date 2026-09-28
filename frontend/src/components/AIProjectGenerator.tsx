@@ -4,7 +4,7 @@ import { Card, Button, Space, Typography, message, Progress, Modal, theme } from
 import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { wizardStreamApi } from '../services/api';
 import type { ApiError } from '../types';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -237,7 +237,7 @@ export const AIProjectGenerator: React.FC<AIProjectGeneratorProps> = ({
       if (isAbortError(error)) return;
 
       const apiError = error as ApiError;
-      const errorMsg = apiError.response?.data?.detail || apiError.message || t('未知错误');
+      const errorMsg = label(apiError.response?.data?.detail) || apiError.message || t('未知错误');
       console.error('恢复生成失败:', errorMsg);
       setErrorDetails(errorMsg);
       message.error(t('恢复生成失败：') + errorMsg);
@@ -621,7 +621,7 @@ export const AIProjectGenerator: React.FC<AIProjectGeneratorProps> = ({
       if (isAbortError(error)) return;
 
       const apiError = error as ApiError;
-      const errorMsg = apiError.response?.data?.detail || apiError.message || t('未知错误');
+      const errorMsg = label(apiError.response?.data?.detail) || apiError.message || t('未知错误');
       console.error('创建项目失败:', errorMsg);
       setErrorDetails(errorMsg);
       message.error(t('创建项目失败：') + errorMsg);

@@ -10,7 +10,7 @@ import type { Character, ApiError } from '../types';
 import { characterApi } from '../services/api';
 import { SSEPostClient } from '../utils/sseClient';
 import api from '../services/api';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -507,14 +507,14 @@ export default function Characters() {
             }
           } catch (error: unknown) {
             const apiError = error as ApiError;
-            message.error(apiError.response?.data?.detail || t('导入失败'));
+            message.error(label(apiError.response?.data?.detail) || t('导入失败'));
             console.error('导入错误:', error);
           }
         },
       });
     } catch (error: unknown) {
       const apiError = error as ApiError;
-      message.error(apiError.response?.data?.detail || t('文件验证失败'));
+      message.error(label(apiError.response?.data?.detail) || t('文件验证失败'));
       console.error('验证错误:', error);
     }
   };
