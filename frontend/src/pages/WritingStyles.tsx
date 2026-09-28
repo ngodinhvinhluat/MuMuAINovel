@@ -285,7 +285,7 @@ export default function WritingStyles() {
                       <Paragraph
                         type="secondary"
                         style={{ fontSize: 13, marginBottom: 12 }}
-                        ellipsis={{ rows: 2, tooltip: style.description }}
+                        ellipsis={{ rows: 2, tooltip: label(style.description) }}
                       >
                         {label(style.description)}
                       </Paragraph>
@@ -302,9 +302,9 @@ export default function WritingStyles() {
                         flex: 1,
                         minHeight: 60,
                       }}
-                      ellipsis={{ rows: 3, tooltip: style.prompt_content }}
+                      ellipsis={{ rows: 3, tooltip: label(style.prompt_content) }}
                     >
-                      {style.prompt_content}
+                      {label(style.prompt_content)}
                     </Paragraph>
                   </div>
                 </Card>

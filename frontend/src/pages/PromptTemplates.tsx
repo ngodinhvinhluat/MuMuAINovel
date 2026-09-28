@@ -468,7 +468,7 @@ export default function PromptTemplates() {
                           ellipsis={{ rows: 3 }}
                           style={{ minHeight: 66, marginBottom: 16 }}
                         >
-                          {template.description || tr('暂无描述')}
+                          {label(template.description) || tr('暂无描述')}
                         </Paragraph>
 
                         <Space wrap style={{ marginBottom: 16 }}>

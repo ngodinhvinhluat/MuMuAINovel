@@ -265,8 +265,8 @@ export default function SkillManage() {
       ellipsis: true,
       render: (text: string, record: SkillItem) => (
         <div style={{ minWidth: 0 }}>
-          <Tooltip title={text}>
-            <strong style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{text}</strong>
+          <Tooltip title={label(text)}>
+            <strong style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label(text)}</strong>
           </Tooltip>
           <Tooltip title={record.name || record.template_key}>
             <span style={{ display: 'block', marginTop: 2, color: token.colorTextTertiary, fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -299,7 +299,7 @@ export default function SkillManage() {
       width: 260,
       ellipsis: true,
       render: (text: string) => (
-        <Tooltip title={text}>
+        <Tooltip title={label(text)}>
           <span
             style={{
               display: 'block',
@@ -311,7 +311,7 @@ export default function SkillManage() {
               fontSize: 13,
             }}
           >
-            {text}
+            {label(text)}
           </span>
         </Tooltip>
       ),

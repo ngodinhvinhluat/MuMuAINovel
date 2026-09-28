@@ -111,22 +111,22 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
             {!isOrganization && (
               <>
                 {character.age && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('年龄：')}</Text>
-                    <Text style={{ flex: 1 }}>{character.age}</Text>
+                    <Text style={{ flex: '1 1 60px', minWidth: 0 }}>{character.age}</Text>
                   </div>
                 )}
                 {character.gender && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('性别：')}</Text>
-                    <Text style={{ flex: 1 }}>{label(character.gender)}</Text>
+                    <Text style={{ flex: '1 1 60px', minWidth: 0 }}>{label(character.gender)}</Text>
                   </div>
                 )}
                 {character.personality && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('性格：')}</Text>
                     <Text
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ flex: '1 1 60px', minWidth: 0 }}
                       ellipsis={{ tooltip: character.personality }}
                     >
                       {character.personality}
@@ -134,10 +134,10 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                   </div>
                 )}
                 {character.relationships && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('关系：')}</Text>
                     <Text
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ flex: '1 1 60px', minWidth: 0 }}
                       ellipsis={{ tooltip: character.relationships }}
                     >
                       {character.relationships}
@@ -151,13 +151,13 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
             {isOrganization && (
               <>
                 {character.organization_type && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('类型：')}</Text>
                     <Tag color="cyan">{character.organization_type}</Tag>
                   </div>
                 )}
                 {character.power_level !== undefined && character.power_level !== null && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('势力等级：')}</Text>
                     <Tag color={character.power_level >= 70 ? 'red' : character.power_level >= 50 ? 'orange' : 'default'}>
                       {character.power_level}
@@ -165,10 +165,10 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                   </div>
                 )}
                 {character.location && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('所在地：')}</Text>
                     <Text
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ flex: '1 1 60px', minWidth: 0 }}
                       ellipsis={{ tooltip: character.location }}
                     >
                       {character.location}
@@ -176,16 +176,16 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                   </div>
                 )}
                 {character.color && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('代表颜色：')}</Text>
-                    <Text style={{ flex: 1, minWidth: 0 }}>{character.color}</Text>
+                    <Text style={{ flex: '1 1 60px', minWidth: 0 }}>{character.color}</Text>
                   </div>
                 )}
                 {character.motto && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('格言：')}</Text>
                     <Text
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ flex: '1 1 60px', minWidth: 0 }}
                       ellipsis={{ tooltip: character.motto }}
                     >
                       {character.motto}
@@ -193,10 +193,10 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                   </div>
                 )}
                 {character.organization_purpose && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('目的：')}</Text>
                     <Text
-                      style={{ flex: 1, minWidth: 0 }}
+                      style={{ flex: '1 1 60px', minWidth: 0 }}
                       ellipsis={{ tooltip: character.organization_purpose }}
                     >
                       {character.organization_purpose}
@@ -204,7 +204,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character, onEdit,
                   </div>
                 )}
                 {character.organization_members && (
-                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start' }}>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', columnGap: 4 }}>
                     <Text type="secondary" style={{ flexShrink: 0 }}>{t('成员：')}</Text>
                     <Text style={{ flex: 1, minWidth: 0, fontSize: 12, lineHeight: 1.6, wordBreak: 'break-all' }}>
                       {typeof character.organization_members === 'string'

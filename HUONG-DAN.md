@@ -40,4 +40,19 @@ Start-MuMu.bat
 
 - Chuyển ngôn ngữ giao diện bằng nút 中文 / Tiếng Việt ở trang đăng nhập, danh sách dự án hoặc menu người dùng.
 - Để AI viết truyện bằng tiếng Việt: vào Cài đặt, mục ngôn ngữ nội dung, chọn **Tiếng Việt**.
-- Khi code có thêm chuỗi tiếng Trung mới (bọc bằng `t('...')`), dịch tự động bằng Claude CLI: `cd frontend && node scripts/i18n-translate.mjs`.
+- Dữ liệu dựng sẵn (thể loại, ngôi kể, giới tính, loại quan hệ, Skill, phong cách viết, mẫu prompt) và thông báo lỗi/tiến trình từ backend được **phủ lớp nghĩa**: giá trị lưu vẫn là tiếng Trung, chỉ chữ hiển thị đổi sang tiếng Việt. Rê chuột lên để xem nguyên văn (tắt trong Cài đặt).
+- Các cụm lệnh kích hoạt Skill (ví dụ 「帮我开书」) giữ nguyên tiếng Trung vì là lệnh cần gõ đúng.
+
+### Cập nhật bản dịch
+
+Yêu cầu Claude CLI đã đăng nhập (xem mục CLI bridge).
+
+```bat
+python backend\scripts\export_i18n_values.py
+cd frontend
+node scripts\i18n-translate.mjs
+```
+
+- Lệnh 1 gom chuỗi hiển thị từ backend vào `frontend/src/i18n/locales/values.source.json`.
+- Lệnh 2 dịch mọi chuỗi còn thiếu (giao diện `t('...')` và dữ liệu `label()`).
+- Gặp chữ Trung chưa dịch khi dùng app: vào **Cài đặt → Xuất văn bản chưa dịch**, rồi chạy `node scripts\i18n-translate.mjs --from đường\dẫn\mumu-missing-translations.json`, sau đó build lại image.

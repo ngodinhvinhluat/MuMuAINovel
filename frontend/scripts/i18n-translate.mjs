@@ -30,6 +30,8 @@ const VALUES_SOURCE_PATH = path.join(LOCALES, 'values.source.json');
 const VALUES_VI_PATH = path.join(LOCALES, 'values.vi.json');
 // Khóa t() chỉ gặp lúc chạy (tra bằng biến), lưu lại từ --from để không bị --prune xóa
 const RUNTIME_KEYS_PATH = path.join(LOCALES, 'runtime-keys.json');
+// Giá trị label() chỉ gặp lúc chạy (dữ liệu dựng sẵn trong DB, mô tả Skill...), lưu từ --from
+const RUNTIME_VALUES_PATH = path.join(LOCALES, 'values.runtime.json');
 const MODEL = process.env.I18N_MODEL || 'sonnet';
 const BATCH = Number(process.env.I18N_BATCH || 100);
 const CONCURRENCY = Number(process.env.I18N_CONCURRENCY || 6);
@@ -95,6 +97,9 @@ function collectKeys() {
   walk(SRC);
   if (fs.existsSync(VALUES_SOURCE_PATH)) {
     for (const v of JSON.parse(fs.readFileSync(VALUES_SOURCE_PATH, 'utf8'))) values.add(v);
+  }
+  if (fs.existsSync(RUNTIME_VALUES_PATH)) {
+    for (const v of JSON.parse(fs.readFileSync(RUNTIME_VALUES_PATH, 'utf8'))) values.add(v);
   }
   if (fs.existsSync(RUNTIME_KEYS_PATH)) {
     for (const k of JSON.parse(fs.readFileSync(RUNTIME_KEYS_PATH, 'utf8'))) keys.add(k);
@@ -216,7 +221,7 @@ async function main() {
       items.forEach((v) => set.add(v));
       fs.writeFileSync(file, JSON.stringify([...set].sort(), null, 2) + '\n', 'utf8');
     };
-    appendTo(VALUES_SOURCE_PATH, extra.values);
+    appendTo(RUNTIME_VALUES_PATH, extra.values);
     appendTo(RUNTIME_KEYS_PATH, extra.translation);
   }
   const uniq = (a) => [...new Set(a)];
