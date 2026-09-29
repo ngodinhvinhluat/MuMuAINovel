@@ -4,7 +4,7 @@ import { Card, Table, Tag, Button, Space, message, Modal, Form, Select, Slider, 
 import { PlusOutlined, ApartmentOutlined, UserOutlined, EditOutlined } from '@ant-design/icons';
 import { useStore } from '../store';
 import axios from 'axios';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 const { TextArea } = Input;
 
@@ -400,8 +400,8 @@ export default function Relationships() {
                       <Space direction="vertical" style={{ width: '100%' }}>
                         {types.map(type => (
                           <Tag key={type.id} color={getCategoryColor(category)}>
-                            {type.icon} {type.name}
-                            {type.reverse_name && ` ↔ ${type.reverse_name}`}
+                            {type.icon} {label(type.name)}
+                            {type.reverse_name && ` ↔ ${label(type.reverse_name)}`}
                           </Tag>
                         ))}
                       </Space>
@@ -460,7 +460,7 @@ export default function Relationships() {
             <AutoComplete
               placeholder={tr('选择预定义类型或输入自定义关系')}
               options={relationshipTypes.map(t => ({
-                label: `${t.icon || ''} ${t.name} (${categoryLabels[t.category]})`,
+                label: `${t.icon || ''} ${label(t.name)} (${categoryLabels[t.category]})`,
                 value: t.name
               }))}
               filterOption={(inputValue, option) =>

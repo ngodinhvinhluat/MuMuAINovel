@@ -29,7 +29,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import { promptTemplateCardStyles, promptTemplateCardHoverHandlers, promptTemplateGridConfig } from '../components/CardStyles';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Title, Text, Paragraph } = Typography;
@@ -73,7 +73,7 @@ export default function PromptTemplates() {
       setCategories(response.data);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || tr('加载失败'));
+      message.error(label(err.response?.data?.detail) || tr('加载失败'));
     } finally {
       setLoading(false);
     }
@@ -119,7 +119,7 @@ export default function PromptTemplates() {
       loadTemplates();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || tr('保存失败'));
+      message.error(label(err.response?.data?.detail) || tr('保存失败'));
     } finally {
       setLoading(false);
     }
@@ -141,7 +141,7 @@ export default function PromptTemplates() {
           loadTemplates();
         } catch (error: unknown) {
           const err = error as { response?: { data?: { detail?: string } } };
-          message.error(err.response?.data?.detail || tr('重置失败'));
+          message.error(label(err.response?.data?.detail) || tr('重置失败'));
         } finally {
           setLoading(false);
         }
@@ -158,7 +158,7 @@ export default function PromptTemplates() {
       loadTemplates();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || tr('操作失败'));
+      message.error(label(err.response?.data?.detail) || tr('操作失败'));
     }
   };
 
@@ -186,7 +186,7 @@ export default function PromptTemplates() {
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || tr('导出失败'));
+      message.error(label(err.response?.data?.detail) || tr('导出失败'));
     }
   };
 
@@ -226,7 +226,7 @@ export default function PromptTemplates() {
                   <ul style={{ marginLeft: 20 }}>
                     {result.converted_templates.map((t: { template_key: string; template_name: string }) => (
                       <li key={t.template_key}>
-                        {t.template_name} ({t.template_key})
+                        {label(t.template_name)} ({t.template_key})
                       </li>
                     ))}
                   </ul>
@@ -243,7 +243,7 @@ export default function PromptTemplates() {
       loadTemplates();
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
-      message.error(err.response?.data?.detail || tr('导入失败'));
+      message.error(label(err.response?.data?.detail) || tr('导入失败'));
     }
     return false; // 阻止默认上传行为
   };
@@ -395,7 +395,7 @@ export default function PromptTemplates() {
                     { key: '0', label: tr('全部 ({{v1}})', { v1: categories.reduce((sum, cat) => sum + cat.count, 0) }) },
                     ...categories.map((cat, index) => ({
                       key: (index + 1).toString(),
-                      label: `${cat.category} (${cat.count})`
+                      label: `${label(cat.category)} (${cat.count})`
                     }))
                   ]}
                 />
@@ -439,7 +439,7 @@ export default function PromptTemplates() {
                         <Space direction="vertical" size={8} style={{ width: '100%' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Title level={isMobile ? 5 : 4} style={{ margin: 0, color: template.is_system_default ? token.colorText : token.colorWhite, flex: 1 }} ellipsis>
-                              {template.template_name}
+                              {label(template.template_name)}
                             </Title>
                             {!template.is_system_default && (
                               <Switch
@@ -452,7 +452,7 @@ export default function PromptTemplates() {
                           </div>
                           <Space wrap>
                             <Tag color={template.is_system_default ? 'default' : 'rgba(255,255,255,0.3)'} style={{ color: template.is_system_default ? token.colorTextSecondary : token.colorWhite, border: 'none' }}>
-                              {template.category}
+                              {label(template.category)}
                             </Tag>
                             <Tag color={template.is_system_default ? 'default' : 'rgba(255,255,255,0.3)'} style={{ color: template.is_system_default ? token.colorTextSecondary : token.colorWhite, border: 'none' }}>
                               {template.is_system_default ? tr('系统默认') : tr('已自定义')}
@@ -468,7 +468,7 @@ export default function PromptTemplates() {
                           ellipsis={{ rows: 3 }}
                           style={{ minHeight: 66, marginBottom: 16 }}
                         >
-                          {template.description || tr('暂无描述')}
+                          {label(template.description) || tr('暂无描述')}
                         </Paragraph>
 
                         <Space wrap style={{ marginBottom: 16 }}>

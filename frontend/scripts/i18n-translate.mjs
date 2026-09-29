@@ -5,6 +5,13 @@
  *   node scripts/i18n-translate.mjs            # dịch các khóa còn thiếu trong vi.json
  *   node scripts/i18n-translate.mjs --check    # chỉ liệt kê số khóa thiếu
  *   node scripts/i18n-translate.mjs --prune    # xóa khóa không còn dùng trong code
+ *   node scripts/i18n-translate.mjs --from mumu-missing-translations.json
+ *                                              # thêm chuỗi chưa dịch xuất từ Cài đặt (nút "Xuất chuỗi chưa dịch")
+ *
+ * Hai nhóm được dịch:
+ *   - translation: khóa t('...') / tr('...') trong code frontend -> locales/vi.json
+ *   - values: dữ liệu từ backend (locales/values.source.json, tạo bằng backend/scripts/export_i18n_values.py)
+ *             và label('...') -> locales/values.vi.json, dùng cho lớp nghĩa label()
  *
  * Tùy chọn qua biến môi trường: I18N_MODEL (mặc định sonnet), I18N_BATCH (100), I18N_CONCURRENCY (6),
  * CLAUDE_BIN (mặc định claude). Yêu cầu `claude` đã đăng nhập.
@@ -17,7 +24,14 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
-const VI_PATH = path.join(SRC, 'i18n', 'locales', 'vi.json');
+const LOCALES = path.join(SRC, 'i18n', 'locales');
+const VI_PATH = path.join(LOCALES, 'vi.json');
+const VALUES_SOURCE_PATH = path.join(LOCALES, 'values.source.json');
+const VALUES_VI_PATH = path.join(LOCALES, 'values.vi.json');
+// Khóa t() chỉ gặp lúc chạy (tra bằng biến), lưu lại từ --from để không bị --prune xóa
+const RUNTIME_KEYS_PATH = path.join(LOCALES, 'runtime-keys.json');
+// Giá trị label() chỉ gặp lúc chạy (dữ liệu dựng sẵn trong DB, mô tả Skill...), lưu từ --from
+const RUNTIME_VALUES_PATH = path.join(LOCALES, 'values.runtime.json');
 const MODEL = process.env.I18N_MODEL || 'sonnet';
 const BATCH = Number(process.env.I18N_BATCH || 100);
 const CONCURRENCY = Number(process.env.I18N_CONCURRENCY || 6);
@@ -28,7 +42,7 @@ const GLOSSARY = `大纲=Dàn ý; 章节=Chương; 角色=Nhân vật; 伏笔=Ph
 技能=Kỹ năng; 设置=Cài đặt; 生成=Tạo; 重新生成=Tạo lại; 续写=Viết tiếp; 润色=Trau chuốt; 拆书=Phân tích sách;
 字数=Số chữ; 模型=Model; 插件=Plugin; 写作风格=Phong cách viết; 剧情=Cốt truyện; 卷=Quyển; 主角=Nhân vật chính`;
 
-const SYSTEM = `You translate UI strings of a Chinese AI novel-writing web app into natural, concise Vietnamese.
+const SYSTEM = `You translate UI strings (labels, options, status/progress and error messages) of a Chinese AI novel-writing web app into natural, concise Vietnamese.
 Rules:
 - Input: a JSON object {"id": "Chinese string"}. Output: ONLY a JSON object with the same ids mapped to Vietnamese. No markdown fences, no commentary.
 - Keep placeholders exactly as-is: {{name}}, {name}, %s, %d, HTML tags, markdown, emoji, URLs, code, numbers, English product names (MCP, API, JSON, AI, Token...).
@@ -63,6 +77,8 @@ function unescapeJs(raw, quote) {
 
 function collectKeys() {
   const keys = new Set(EXTRA_KEYS);
+  const values = new Set();
+  const labelRe = /(?<![\w$.])label\(\s*(['"])((?:\\.|(?!\1)[^\\])*)\1\s*\)/g;
   const re = /(?<![\w$.])(?:i18n\.)?(?:t|tr)\(\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
   const walk = (dir) => {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -79,7 +95,16 @@ function collectKeys() {
     }
   };
   walk(SRC);
-  return [...keys];
+  if (fs.existsSync(VALUES_SOURCE_PATH)) {
+    for (const v of JSON.parse(fs.readFileSync(VALUES_SOURCE_PATH, 'utf8'))) values.add(v);
+  }
+  if (fs.existsSync(RUNTIME_VALUES_PATH)) {
+    for (const v of JSON.parse(fs.readFileSync(RUNTIME_VALUES_PATH, 'utf8'))) values.add(v);
+  }
+  if (fs.existsSync(RUNTIME_KEYS_PATH)) {
+    for (const k of JSON.parse(fs.readFileSync(RUNTIME_KEYS_PATH, 'utf8'))) keys.add(k);
+  }
+  return { translation: [...keys], values: [...values] };
 }
 
 function placeholders(s) {
@@ -137,41 +162,73 @@ async function translateBatch(batch, attempt = 1) {
   }
 }
 
-async function main() {
-  const vi = fs.existsSync(VI_PATH) ? JSON.parse(fs.readFileSync(VI_PATH, 'utf8') || '{}') : {};
-  const keys = collectKeys();
-  const missing = keys.filter((k) => !vi[k]);
+function readJson(file) {
+  return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8') || '{}') : {};
+}
+
+function writeSorted(file, obj) {
+  const sorted = Object.fromEntries(Object.keys(obj).sort().map((k) => [k, obj[k]]));
+  fs.writeFileSync(file, JSON.stringify(sorted, null, 2) + '\n', 'utf8');
+}
+
+async function translateInto(name, file, keys, { prune, check }) {
+  const table = readJson(file);
   const keySet = new Set(keys);
-  const stale = Object.keys(vi).filter((k) => !keySet.has(k));
-  console.log(`keys=${keys.length} translated=${keys.length - missing.length} missing=${missing.length} stale=${stale.length}`);
-  if (process.argv.includes('--prune') && stale.length) {
-    stale.forEach((k) => delete vi[k]);
-    fs.writeFileSync(VI_PATH, JSON.stringify(vi, null, 2) + '\n', 'utf8');
-    console.log(`pruned ${stale.length} stale keys`);
+  const missing = keys.filter((k) => !table[k]);
+  const stale = Object.keys(table).filter((k) => !keySet.has(k));
+  console.log(`[${name}] keys=${keys.length} translated=${keys.length - missing.length} missing=${missing.length} stale=${stale.length}`);
+  if (prune && stale.length) {
+    stale.forEach((k) => delete table[k]);
+    writeSorted(file, table);
+    console.log(`[${name}] pruned ${stale.length} stale keys`);
   }
-  if (process.argv.includes('--check') || !missing.length) return;
+  if (check || !missing.length) return;
 
   const batches = [];
   for (let i = 0; i < missing.length; i += BATCH) batches.push(missing.slice(i, i + BATCH));
   let done = 0;
-  const save = () => {
-    const sorted = Object.fromEntries(Object.keys(vi).sort().map((k) => [k, vi[k]]));
-    fs.writeFileSync(VI_PATH, JSON.stringify(sorted, null, 2) + '\n', 'utf8');
-  };
   const queue = [...batches];
   await Promise.all(
     Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
       while (queue.length) {
         const batch = queue.shift();
-        Object.assign(vi, await translateBatch(batch));
+        Object.assign(table, await translateBatch(batch));
         done += 1;
-        save();
-        console.log(`  batch ${done}/${batches.length} done`);
+        writeSorted(file, table);
+        console.log(`  [${name}] batch ${done}/${batches.length} done`);
       }
     }),
   );
-  const still = keys.filter((k) => !vi[k]).length;
-  console.log(`finished: missing=${still}`);
+  console.log(`[${name}] finished: missing=${keys.filter((k) => !table[k]).length}`);
+}
+
+async function main() {
+  const argv = process.argv.slice(2);
+  const check = argv.includes('--check');
+  const fromIndex = argv.indexOf('--from');
+  const collected = collectKeys();
+  const extra = { translation: [], values: [] };
+  if (fromIndex >= 0) {
+    const file = argv[fromIndex + 1];
+    if (!file) throw new Error('--from cần đường dẫn file JSON');
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    extra.translation = Array.isArray(data.translation) ? data.translation : [];
+    extra.values = Array.isArray(data.values) ? data.values : [];
+    // Lưu lại để lần chạy sau (và --prune) vẫn giữ các chuỗi này
+    const appendTo = (file, items) => {
+      if (!items.length) return;
+      const set = new Set(fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : []);
+      items.forEach((v) => set.add(v));
+      fs.writeFileSync(file, JSON.stringify([...set].sort(), null, 2) + '\n', 'utf8');
+    };
+    appendTo(RUNTIME_VALUES_PATH, extra.values);
+    appendTo(RUNTIME_KEYS_PATH, extra.translation);
+  }
+  const uniq = (a) => [...new Set(a)];
+  const prune = argv.includes('--prune');
+  const all = fromIndex >= 0 ? collectKeys() : collected;
+  await translateInto('translation', VI_PATH, uniq(all.translation), { prune, check });
+  await translateInto('values', VALUES_VI_PATH, uniq(all.values), { prune, check });
 }
 
 main().catch((e) => {

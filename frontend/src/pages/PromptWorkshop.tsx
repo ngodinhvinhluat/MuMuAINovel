@@ -48,7 +48,7 @@ import type {
   User,
 } from '../types';
 import { PROMPT_CATEGORIES } from '../types';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -507,7 +507,7 @@ export default function PromptWorkshop() {
                       {item.tags && item.tags.length > 0 && (
                         <Space size={4} wrap style={{ marginTop: 8 }}>
                           {item.tags.slice(0, 3).map(tag => (
-                            <Tag key={tag} style={{ fontSize: 11 }}>{tag}</Tag>
+                            <Tag key={tag} style={{ fontSize: 11 }}>{label(tag)}</Tag>
                           ))}
                           {item.tags.length > 3 && (
                             <Tag style={{ fontSize: 11 }}>+{item.tags.length - 3}</Tag>

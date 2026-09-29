@@ -16,7 +16,7 @@ import {
 import type { AnalysisTask, ChapterAnalysisResponse } from '../types';
 import ChapterRegenerationModal from './ChapterRegenerationModal';
 import ChapterContentComparison from './ChapterContentComparison';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 // 判断是否为移动设备
 const isMobileDevice = () => window.innerWidth < 768;
@@ -192,7 +192,7 @@ export default function ChapterAnalysis({ chapterId, visible, onClose }: Chapter
           await loadChapterInfo(requestedChapterId, generation);
           return;
         } else if (taskData.status === 'failed') {
-          setError(taskData.error_message || t('分析失败'));
+          setError(label(taskData.error_message) || t('分析失败'));
           return;
         }
       } catch (err) {
@@ -343,7 +343,7 @@ export default function ChapterAnalysis({ chapterId, visible, onClose }: Chapter
         {task.status === 'failed' && task.error_message && (
           <Alert
             message={t('分析失败')}
-            description={task.error_message}
+            description={label(task.error_message)}
             type="error"
             showIcon
             style={{

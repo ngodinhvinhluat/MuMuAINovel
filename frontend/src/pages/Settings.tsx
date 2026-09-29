@@ -4,7 +4,8 @@ import { SaveOutlined, DeleteOutlined, ReloadOutlined, InfoCircleOutlined, Check
 import { settingsApi, mcpPluginApi } from '../services/api';
 import type { SettingsUpdate, APIKeyPreset, PresetCreateRequest, APIKeyPresetConfig } from '../types';
 import { eventBus, EventNames } from '../store/eventBus';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
+import TranslationTools from '../components/TranslationTools';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -496,7 +497,7 @@ export default function SettingsPage() {
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.detail || t('获取模型列表失败');
+      const errorMsg = label(error?.response?.data?.detail) || t('获取模型列表失败');
       if (!silent) {
         message.error(errorMsg);
       }
@@ -552,7 +553,7 @@ export default function SettingsPage() {
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.detail || t('测试请求失败');
+      const errorMsg = label(error?.response?.data?.detail) || t('测试请求失败');
       message.error(errorMsg);
       setTestResult({
         success: false,
@@ -649,7 +650,7 @@ export default function SettingsPage() {
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.detail || t('获取模型列表失败');
+      const errorMsg = label(error?.response?.data?.detail) || t('获取模型列表失败');
       if (!silent) {
         message.error(errorMsg);
       }
@@ -738,7 +739,7 @@ export default function SettingsPage() {
       loadPresets();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      message.error(error.response?.data?.detail || t('设置章节内容分析API配置失败'));
+      message.error(label(error.response?.data?.detail) || t('设置章节内容分析API配置失败'));
       console.error(error);
     } finally {
       setSavingChapterAnalysisPreset(false);
@@ -752,7 +753,7 @@ export default function SettingsPage() {
       loadPresets();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      message.error(error.response?.data?.detail || t('删除失败'));
+      message.error(label(error.response?.data?.detail) || t('删除失败'));
       console.error(error);
     }
   };
@@ -1035,7 +1036,7 @@ export default function SettingsPage() {
                 onChange={(value) => handleChapterAnalysisPresetChange(value)}
                 options={presets.map((preset) => ({
                   value: preset.id,
-                  label: `${preset.name} (${preset.config.llm_model})`,
+                  label: `${label(preset.name)} (${preset.config.llm_model})`,
                 }))}
               />
             </Space>
@@ -1126,7 +1127,7 @@ export default function SettingsPage() {
                     }
                     title={
                       <Space>
-                        <span style={{ fontWeight: 'bold' }}>{preset.name}</span>
+                        <span style={{ fontWeight: 'bold' }}>{label(preset.name)}</span>
                         {isActive && <Tag color="success">{t('激活中')}</Tag>}
                         {preset.id === chapterAnalysisPresetId && <Tag color="processing">{t('章节分析')}</Tag>}
                       </Space>
@@ -1134,7 +1135,7 @@ export default function SettingsPage() {
                     description={
                       <Space direction="vertical" size="small" style={{ width: '100%' }}>
                         {preset.description && (
-                          <div style={{ color: token.colorTextSecondary }}>{preset.description}</div>
+                          <div style={{ color: token.colorTextSecondary }}>{label(preset.description)}</div>
                         )}
                         <Space wrap>
                           <Tag color={getProviderColor(preset.config.api_provider)}>
@@ -1246,6 +1247,7 @@ export default function SettingsPage() {
                 />
               </Col>
             </Row>
+            <TranslationTools />
           </Card>
 
           {/* 主内容卡片 */}

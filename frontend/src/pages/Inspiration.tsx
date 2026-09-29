@@ -4,7 +4,7 @@ import { Card, Input, Button, Space, Typography, message, Spin, Modal, theme } f
 import { SendOutlined, ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import { inspirationApi } from '../services/api';
 import { AIProjectGenerator, type GenerationConfig } from '../components/AIProjectGenerator';
-import { t } from '../i18n';
+import { t, label, labelList } from '../i18n';
 
 // 选项文本可能已被翻译：同时匹配中文原文与当前语言译文
 const isOption = (option: string, zhText: string) => option === zhText || option === t(zhText);
@@ -379,7 +379,7 @@ const Inspiration: React.FC = () => {
       console.error('优化选项失败:', error);
       const errMsg = error instanceof Error ? error.message : t('优化失败，请重试');
       const axiosError = error as { response?: { data?: { detail?: string } } };
-      message.error(axiosError.response?.data?.detail || errMsg);
+      message.error(label(axiosError.response?.data?.detail) || errMsg);
     } finally {
       if (sessionVersion === sessionVersionRef.current) setRefining(false);
     }
@@ -453,7 +453,7 @@ const Inspiration: React.FC = () => {
       console.error('发送消息失败:', error);
       const errMsg = error instanceof Error ? error.message : t('生成失败，请重试');
       const axiosError = error as { response?: { data?: { detail?: string } } };
-      message.error(axiosError.response?.data?.detail || errMsg);
+      message.error(label(axiosError.response?.data?.detail) || errMsg);
     } finally {
       if (sessionVersion === sessionVersionRef.current) setLoading(false);
     }
@@ -536,7 +536,7 @@ const Inspiration: React.FC = () => {
 
       // 显示摘要
       const modeText = modeValue === 'one-to-one' ? t('一对一模式') : t('一对多模式');
-      const summary = t('\n太棒了！你的小说设定已完成，请确认：\n\n📖 书名：{{title}}\n📝 简介：{{description}}\n🎯 主题：{{theme}}\n🏷️ 类型：{{genre}}\n👁️ 视角：{{narrative_perspective}}\n📋 大纲模式：{{modeText}}\n\n请选择下一步操作：\n      ', { title: updatedData.title, description: updatedData.description, theme: updatedData.theme, genre: updatedData.genre.join('、'), narrative_perspective: updatedData.narrative_perspective, modeText }).trim();
+      const summary = t('\n太棒了！你的小说设定已完成，请确认：\n\n📖 书名：{{title}}\n📝 简介：{{description}}\n🎯 主题：{{theme}}\n🏷️ 类型：{{genre}}\n👁️ 视角：{{narrative_perspective}}\n📋 大纲模式：{{modeText}}\n\n请选择下一步操作：\n      ', { title: updatedData.title, description: updatedData.description, theme: updatedData.theme, genre: labelList(updatedData.genre), narrative_perspective: label(updatedData.narrative_perspective), modeText }).trim();
 
       const aiMessage: Message = {
         type: 'ai',
@@ -612,7 +612,7 @@ const Inspiration: React.FC = () => {
       console.error('选择选项失败:', error);
       const errMsg = error instanceof Error ? error.message : t('生成失败，请重试');
       const axiosError = error as { response?: { data?: { detail?: string } } };
-      message.error(axiosError.response?.data?.detail || errMsg);
+      message.error(label(axiosError.response?.data?.detail) || errMsg);
     } finally {
       if (sessionVersion === sessionVersionRef.current) setLoading(false);
     }
@@ -660,7 +660,7 @@ const Inspiration: React.FC = () => {
       console.error('处理自定义输入失败:', error);
       const errMsg = error instanceof Error ? error.message : t('处理失败，请重试');
       const axiosError = error as { response?: { data?: { detail?: string } } };
-      message.error(axiosError.response?.data?.detail || errMsg);
+      message.error(label(axiosError.response?.data?.detail) || errMsg);
     } finally {
       if (sessionVersion === sessionVersionRef.current) setLoading(false);
     }

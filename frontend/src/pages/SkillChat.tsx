@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Input, Button, Tag, List, Typography, Space, Spin, message, Tooltip, Tabs, theme } from 'antd';
 import { SendOutlined, RobotOutlined, UserOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
 // 使用简单的文本渲染替代 react-markdown
 const MarkdownRender: React.FC<{ content: string }> = ({ content }) => {
   return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
@@ -171,9 +171,9 @@ const SkillChat: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
           <Button size="small" onClick={() => { setSelectedSkill(null); setMessages([]); }}>{tr('← 返回')}</Button>
           <ThunderboltOutlined style={{ color: '#1890ff' }} />
-          <Text strong>{selectedSkill.template_name}</Text>
-          <Tag color={categoryColors[selectedSkill.category] || '#default'} style={{ marginLeft: 4 }}>{tr(selectedSkill.category)}</Tag>
-          <Tooltip title={selectedSkill.description} placement="bottom">
+          <Text strong>{label(selectedSkill.template_name)}</Text>
+          <Tag color={categoryColors[selectedSkill.category] || '#default'} style={{ marginLeft: 4 }}>{label(selectedSkill.category)}</Tag>
+          <Tooltip title={label(selectedSkill.description)} placement="bottom">
             <Text
               type="secondary"
               style={{
@@ -184,7 +184,7 @@ const SkillChat: React.FC = () => {
               }}
               ellipsis
             >
-              {selectedSkill.description}
+              {label(selectedSkill.description)}
             </Text>
           </Tooltip>
         </div>
@@ -288,7 +288,7 @@ const SkillChat: React.FC = () => {
                   <ThunderboltOutlined />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <Tooltip title={skill.template_name}>
+                  <Tooltip title={label(skill.template_name)}>
                     <Text
                       strong
                       style={{
@@ -300,19 +300,19 @@ const SkillChat: React.FC = () => {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {skill.template_name}
+                      {label(skill.template_name)}
                     </Text>
                   </Tooltip>
                   <Tag
                     color={categoryColors[skill.category] || '#default'}
                     style={{ maxWidth: '100%', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                   >
-                    {tr(skill.category)}
+                    {label(skill.category)}
                   </Tag>
                 </div>
               </div>
 
-              <Tooltip title={skill.description} placement="bottom">
+              <Tooltip title={label(skill.description)} placement="bottom">
                 <Paragraph
                   type="secondary"
                   ellipsis={{ rows: 3 }}
@@ -324,7 +324,7 @@ const SkillChat: React.FC = () => {
                     lineHeight: 1.65,
                   }}
                 >
-                  {skill.description}
+                  {label(skill.description)}
                 </Paragraph>
               </Tooltip>
 
@@ -388,7 +388,7 @@ const SkillChat: React.FC = () => {
               key: category,
               label: (
                 <span>
-                  <Tag color={categoryColors[category] || '#default'}>{tr(category)}</Tag>
+                  <Tag color={categoryColors[category] || '#default'}>{label(category)}</Tag>
                   {tr('{{length}} 个 Skill', { length: groupedSkills[category].length })}
                 </span>
               ),

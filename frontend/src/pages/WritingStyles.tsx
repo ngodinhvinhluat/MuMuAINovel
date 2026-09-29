@@ -25,7 +25,7 @@ import {
 import { useStore } from '../store';
 import { writingStyleApi } from '../services/api';
 import type { WritingStyle, WritingStyleCreate, WritingStyleUpdate } from '../types';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { TextArea } = Input;
 const { Text, Paragraph } = Typography;
@@ -274,7 +274,7 @@ export default function WritingStyles() {
                 >
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <Space style={{ marginBottom: 12 }} wrap>
-                      <Text strong style={{ fontSize: 16 }}>{style.name}</Text>
+                      <Text strong style={{ fontSize: 16 }}>{label(style.name)}</Text>
                       <Tag color={getStyleTypeColor(style.style_type)}>
                         {getStyleTypeLabel(style.style_type)}
                       </Tag>
@@ -285,9 +285,9 @@ export default function WritingStyles() {
                       <Paragraph
                         type="secondary"
                         style={{ fontSize: 13, marginBottom: 12 }}
-                        ellipsis={{ rows: 2, tooltip: style.description }}
+                        ellipsis={{ rows: 2, tooltip: label(style.description) }}
                       >
-                        {style.description}
+                        {label(style.description)}
                       </Paragraph>
                     )}
                     
@@ -302,9 +302,9 @@ export default function WritingStyles() {
                         flex: 1,
                         minHeight: 60,
                       }}
-                      ellipsis={{ rows: 3, tooltip: style.prompt_content }}
+                      ellipsis={{ rows: 3, tooltip: label(style.prompt_content) }}
                     >
-                      {style.prompt_content}
+                      {label(style.prompt_content)}
                     </Paragraph>
                   </div>
                 </Card>

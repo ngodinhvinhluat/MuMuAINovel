@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { label, t } from '../i18n';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SSEMessage {
   type: 'progress' | 'chunk' | 'result' | 'error' | 'done';
@@ -67,7 +67,7 @@ export class SSEClient {
       case 'progress':
         if (this.options.onProgress && message.progress !== undefined) {
           this.options.onProgress(
-            message.message || '',
+            label(message.message),
             message.progress,
             message.status || 'processing',
             message.word_count
@@ -92,10 +92,10 @@ export class SSEClient {
 
       case 'error':
         if (this.options.onError) {
-          this.options.onError(message.error || t('未知错误'), message.code);
+          this.options.onError(label(message.error) || t('未知错误'), message.code);
         }
         this.close();
-        reject(new Error(message.error || t('未知错误')));
+        reject(new Error(label(message.error) || t('未知错误')));
         break;
 
       case 'done':
@@ -237,7 +237,7 @@ export class SSEPostClient {
       case 'progress':
         if (this.options.onProgress && message.progress !== undefined) {
           this.options.onProgress(
-            message.message || '',
+            label(message.message),
             message.progress,
             message.status || 'processing',
             message.word_count
@@ -263,9 +263,9 @@ export class SSEPostClient {
 
       case 'error':
         if (this.options.onError) {
-          this.options.onError(message.error || t('未知错误'), message.code);
+          this.options.onError(label(message.error) || t('未知错误'), message.code);
         }
-        reject(new Error(message.error || t('未知错误')));
+        reject(new Error(label(message.error) || t('未知错误')));
         break;
 
       case 'done':

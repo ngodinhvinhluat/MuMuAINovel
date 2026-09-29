@@ -14,7 +14,7 @@ import { SSELoadingOverlay } from '../components/SSELoadingOverlay';
 import ChapterReader from '../components/ChapterReader';
 import PartialRegenerateToolbar from '../components/PartialRegenerateToolbar';
 import PartialRegenerateModal from '../components/PartialRegenerateModal';
-import { t } from '../i18n';
+import { t, label } from '../i18n';
 
 const { TextArea } = Input;
 
@@ -380,7 +380,7 @@ export default function Chapters() {
           if (task?.status === 'completed') {
             message.success(t('章节分析完成'));
           } else if (task?.status === 'failed') {
-            message.error(t('章节分析失败: {{v1}}', { v1: task.error_message || t('未知错误') }));
+            message.error(t('章节分析失败: {{v1}}', { v1: label(task.error_message) || t('未知错误') }));
           }
         }
       });
@@ -891,7 +891,7 @@ export default function Chapters() {
       }
     } catch (error) {
       const apiError = error as ApiError;
-      message.error(t('AI创作失败：') + (apiError.response?.data?.detail || apiError.message || t('未知错误')));
+      message.error(t('AI创作失败：') + (label(apiError.response?.data?.detail) || apiError.message || t('未知错误')));
     } finally {
       setIsContinuing(false);
       setIsGenerating(false);
@@ -1319,11 +1319,11 @@ export default function Chapters() {
               'success'
             );
           } else if (status.status === 'failed') {
-            message.error(t('批量生成失败：{{v1}}', { v1: status.error_message || t('未知错误') }));
+            message.error(t('批量生成失败：{{v1}}', { v1: label(status.error_message) || t('未知错误') }));
             // 🔔 触发浏览器通知
             showBrowserNotification(
               t('批量生成失败'),
-              status.error_message || t('未知错误'),
+              label(status.error_message) || t('未知错误'),
               'error'
             );
           } else if (status.status === 'cancelled') {
@@ -1626,7 +1626,7 @@ export default function Chapters() {
           <Tag
             icon={<SyncOutlined spin />}
             color={isRetrying ? "warning" : "processing"}
-            title={task.error_message || undefined}
+            title={label(task.error_message) || undefined}
           >
             {isRetrying ? t('重试中 {{progress}}%', { progress: task.progress }) : t('分析中 {{progress}}%', { progress: task.progress })}
           </Tag>
@@ -1640,7 +1640,7 @@ export default function Chapters() {
         );
       case 'failed':
         return (
-          <Tag icon={<CloseCircleOutlined />} color="error" title={task.error_message || undefined}>
+          <Tag icon={<CloseCircleOutlined />} color="error" title={label(task.error_message) || undefined}>
             {t('分析失败')}
           </Tag>
         );
@@ -2657,7 +2657,7 @@ export default function Chapters() {
               >
                 {writingStyles.map(style => (
                   <Select.Option key={style.id} value={style.id}>
-                    {style.name}{style.is_default && t(' (默认)')}
+                    {label(style.name)}{style.is_default && t(' (默认)')}
                   </Select.Option>
                 ))}
               </Select>
@@ -2711,10 +2711,10 @@ export default function Chapters() {
                 optionFilterProp="label"
               >
                 {availableSkills.map(skill => (
-                  <Select.Option key={skill.template_key} value={skill.template_key} label={skill.template_name}>
+                  <Select.Option key={skill.template_key} value={skill.template_key} label={label(skill.template_name)}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span>{skill.template_name}</span>
-                      <Tag style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}>{skill.category}</Tag>
+                      <span>{label(skill.template_name)}</span>
+                      <Tag style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}>{label(skill.category)}</Tag>
                     </div>
                   </Select.Option>
                 ))}
@@ -2723,7 +2723,7 @@ export default function Chapters() {
                 const skill = availableSkills.find(s => s.template_key === selectedSkillKey);
                 return skill ? (
                   <div style={{ color: token.colorSuccess, fontSize: 12, marginTop: 4 }}>
-                    ✓ {skill.description}
+                    ✓ {label(skill.description)}
                   </div>
                 ) : null;
               })()}
@@ -2975,7 +2975,7 @@ export default function Chapters() {
                 <Select placeholder={t('请选择写作风格')} showSearch optionFilterProp="children">
                   {writingStyles.map(style => (
                     <Select.Option key={style.id} value={style.id}>
-                      {style.name}{style.is_default && t(' (默认)')}
+                      {label(style.name)}{style.is_default && t(' (默认)')}
                     </Select.Option>
                   ))}
                 </Select>
@@ -3041,10 +3041,10 @@ export default function Chapters() {
                   optionFilterProp="label"
                 >
                   {availableSkills.map(skill => (
-                    <Select.Option key={skill.template_key} value={skill.template_key} label={skill.template_name}>
+                    <Select.Option key={skill.template_key} value={skill.template_key} label={label(skill.template_name)}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span>{skill.template_name}</span>
-                        <Tag style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}>{skill.category}</Tag>
+                        <span>{label(skill.template_name)}</span>
+                        <Tag style={{ fontSize: 11, lineHeight: '18px', padding: '0 4px' }}>{label(skill.category)}</Tag>
                       </div>
                     </Select.Option>
                   ))}

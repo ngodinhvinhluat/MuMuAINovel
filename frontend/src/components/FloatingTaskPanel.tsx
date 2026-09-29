@@ -13,7 +13,8 @@ import {
 } from '@ant-design/icons';
 import { getProjectTasks, getTaskStatus, cancelTask, cancelBatchTask, deleteTask, clearProjectTasks, type TaskStatus } from '../services/backgroundTaskService';
 import { eventBus, EventNames } from '../store/eventBus';
-import { t as tr } from '../i18n';
+import { t as tr, label } from '../i18n';
+import Label from './Label';
 
 interface FloatingTaskPanelProps {
   projectId: string;
@@ -352,7 +353,7 @@ export const FloatingTaskPanel: React.FC<FloatingTaskPanelProps> = ({
                             marginBottom: 4,
                           }}
                         >
-                          {task.status_message}
+                          <Label value={task.status_message} />
                         </div>
                       )}
 
@@ -373,7 +374,7 @@ export const FloatingTaskPanel: React.FC<FloatingTaskPanelProps> = ({
                             marginBottom: 4,
                           }}
                         >
-                          {tr('错误: {{error_message}}', { error_message: task.error_message })}
+                          {tr('错误: {{error_message}}', { error_message: label(task.error_message) })}
                         </div>
                       )}
 
